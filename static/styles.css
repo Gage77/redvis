@@ -1,0 +1,55 @@
+body.vscode-light {
+    background-color: #FCF0F2;
+    color: #0F2417;
+}
+
+body.vscode-dark {
+    background-color: #343434;
+    color: #DFDFDF;
+}
+
+body.vscode-high-contrast {
+    background-color: #011936;
+    color: #F4FFFD;
+}
+
+code {
+    color: var(--vscode-editor-foreground);
+    background-color: var(--vscode-editor-background);
+}
+
+.navbar {
+    overflow: hidden;
+    background-color: #273E47;
+    color: #DFDFDF;
+}
+
+.navbar h1 {
+    float: left;
+    display: block;
+    text-align: center;
+    margin-top: 10px;
+    margin-left: 16px;
+}
+
+.navbar .search-container {
+    float: right;
+}
+
+.navbar .search-container input[type=text] {
+    padding: 6px;
+    margin-top: 10px;
+    margin-right: 16px;
+    font-size: 17px;
+    border: none;
+}
+
+.navbar .search-container button {
+    float: right;
+    padding: 6px;
+    margin-top: 10px;
+    margin-right: 16px;
+    background: #D8973C;
+    color: #DFDFDF;
+    border: none;
+}
