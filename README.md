@@ -1,65 +1,45 @@
 # redvis README
 
-This is the README for your extension "redvis". After writing up a brief description, we recommend including the following sections.
+RedVis is a Visual Studio Code extension designed to allow users to browse top posts on specified subreddits without having to leave VS Code.
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+RedVis allows users to:
 
-For example if there is an image subfolder under your extension project workspace:
-
-\!\[feature X\]\(images/feature-x.png\)
-
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+* Browse the top posts of specified subreddits without having to leave VS Code
 
 ## Requirements
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+RedVis relies on two npm packages, along with a config.json file that specifies auth details for querying the Reddit API.
 
-## Extension Settings
+### Npm packages
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+* [path](https://www.npmjs.com/package/path)
 
-For example:
+* [snoowrap](https://www.npmjs.com/package/snoowrap)
 
-This extension contributes the following settings:
+### config.json structure
 
-* `myExtension.enable`: enable/disable this extension
-* `myExtension.thing`: set to `blah` to do something
+Place a `config.json` file in the main project directory of this extension with information that can be acquired by registering for a [Reddit account](https://www.reddit.com/register/) and creating a Reddit "app" [here](https://ssl.reddit.com/prefs/apps/).
+
+```json
+{
+    "userAgent": "name-of-app",
+    "clientId": "client-id",
+    "clientSecret": "client-secret",
+    "username": "reddit-account-username",
+    "password": "reddit-account-password"
+}
+```
 
 ## Known Issues
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+Currently, RedVis does not protect against XSS and other user input based attacks. This is a planned feature.
 
 ## Release Notes
 
-Users appreciate release notes as you update your extension.
+Thank you to members of [Hacklahoma](https://hacklahoma.org) for putting on the Hackathon during which I coded this extension!
 
 ### 1.0.0
 
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
------------------------------------------------------------------------------------------------------------
-
-## Working with Markdown
-
-**Note:** You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+CMD+V` on macOS or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (macOS) to see a list of Markdown snippets
-
-### For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+* Create RedVis tab and search subreddits to view top 25 posts
