@@ -3,7 +3,7 @@ const config = require('./config.json');
 const path = require('path');
 const snoowrap = require('snoowrap');
 
-
+// Create snoowrap instance
 const r = new snoowrap({
 	userAgent: config.userAgent,
 	clientId: config.clientId,
@@ -12,36 +12,43 @@ const r = new snoowrap({
 	password: config.password
 });
 
+let postList = `<h2>Search for a subreddit above!</h2>`
+let currentSub = '/r/programmerhumor';
+
 // Construct post data from API response
-function constructPostList(qs, res) {
-	const postListBody = `<h2>${qs}</h2>`;
+function constructPostList(res) {
+	console.log(currentSub);
+	let postListBody = `<h1 class="current-subreddit">/r/${currentSub}</h1><hr>`;
 	for (let i = 0; i < res.length; i++) {
-		postListBody.concat(`<a>${res[i]}</a><hr>`)
+		postListBody += `<div class="post-title-container"><button class="post-title" value="${res[i]}" onclick="getPostDetails(this.value)">${res[i]}</button></div><br>`;
 	}
+	postList = postListBody;
 }
 
 // Query for subreddit (programmerhumor top by default)
 function getSubInfo(queryString) {
 	let titles = [];
+	currentSub = queryString;
 
 	// If subreddit name is provided
-	if (queryString != '') {
-		r.getHot(queryString).then((posts, queryString) => {
+	if (currentSub != '') {
+		r.getHot(queryString).then((posts) => {
 			for (let i = 0; i < posts.length; i++) {
 				titles.push(posts[i].title);
 			}
 			console.log(titles);
-			return constructPostList(queryString, titles);
+			return constructPostList(titles);
 		});
 	}
 	// Otherwise get top of "/ProgrammerHumor"
 	else {
-		r.getHot('programmerhumor').then((posts, queryString) => {
+		currentSub = 'programmerhumor'
+		r.getHot(currentSub).then((posts) => {
 			for (let i = 0; i < posts.length; i++) {
 				titles.push(posts[i].title);
 			}
 			console.log(titles);
-			return constructPostList(queryString, titles);
+			return constructPostList(titles);
 		});
 	}
 }
@@ -60,6 +67,7 @@ function getWebviewContent(stylesheet, postList) {
 	<script>
 			const vscode = acquireVsCodeApi();
 
+			// Handle vs extension message passing (from extension to webpage)
 			window.addEventListener('message', event => {
 				const message = event.data;
 				switch(message.command) {
@@ -69,14 +77,23 @@ function getWebviewContent(stylesheet, postList) {
 				}
 			});
 
-			// Send the search input fields value to backend
+			// Handle vs extension message passing (from webpage to extension)
+			function handleMessageSending(messageText, messageCommand) {
+				vscode.postMessage({
+					command: messageCommand,
+					text: messageText
+				});
+			}
+
+			// Search 
 			function submitSearch() {
 				const searchFieldText = document.getElementById('subreddit-search-input').value;
-				console.log(searchFieldText);
-				vscode.postMessage({
-					command: 'doSearch',
-					text: searchFieldText
-				});
+				handleMessageSending(searchFieldText, 'doSearch');
+			}
+			
+			// Get details on specified post
+			function getPostDetails(postTitle) {
+				handleMessageSending(postTitle, 'doGetPostDetails');
 			}
 		</script>
 
@@ -136,10 +153,20 @@ function activate(context) {
 		panel.webview.onDidReceiveMessage(
 			message => {
 				switch (message.command) {
+					// Search subreddit for hot posts (25)
 					case 'doSearch':
-						vscode.window.showInformationMessage('Performing search of /' + message.text + ' subreddit...');
-						let postList = getSubInfo(message.text);
-						panel.webview.html = getWebviewContent(stylesheet, postList);
+						if (message.text == '')
+							vscode.window.showInformationMessage('Performing default search of "/r/programmerhumor" ...');
+						else
+							vscode.window.showInformationMessage('Performing search of /r/' + message.text + ' ...');
+						getSubInfo(message.text);
+						setTimeout(function() {
+							panel.webview.html = getWebviewContent(stylesheet, postList);
+						},1750);
+						return;
+					// Get the details of specified post
+					case 'doGetPostDetails':
+						vscode.window.showInformationMessage('Getting post details for "' + message.text + '" ...');
 						return;
 				}
 			},

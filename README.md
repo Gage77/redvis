@@ -1,4 +1,4 @@
-# redvis README
+# RedVis README
 
 RedVis is a Visual Studio Code extension designed to allow users to browse top posts on specified subreddits without having to leave VS Code.
 
@@ -7,6 +7,8 @@ RedVis is a Visual Studio Code extension designed to allow users to browse top p
 RedVis allows users to:
 
 * Browse the top posts of specified subreddits without having to leave VS Code
+
+* View details of specific post (post body, comments, etc.)
 
 ## Requirements
 
