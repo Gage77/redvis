@@ -1,0 +1,87 @@
+body.vscode-light {
+    background-color: #F4F6F7;
+    color: #212F3D;
+}
+
+body.vscode-dark {
+    background-color: #212F3D;
+    color: #F4F6F7  ;
+}
+
+body.vscode-high-contrast {
+    background-color: #212F3D;
+    color: #F4F6F7;
+}
+
+code {
+    color: var(--vscode-editor-foreground);
+    background-color: var(--vscode-editor-background);
+}
+
+.navbar {
+    overflow: hidden;
+    background-color: #A4243B;
+    color: #F4F6F7;
+}
+
+.navbar h1 {
+    float: left;
+    display: block;
+    text-align: center;
+    margin-top: 10px;
+    margin-left: 16px;
+    font-size: 40px;
+}
+
+.navbar .search-container {
+    float: right;
+    margin-top: 10px;
+}
+
+.navbar .search-container input[type=text] {
+    padding: 6px;
+    margin-top: 10px;
+    margin-right: 16px;
+    font-size: 17px;
+    border: none;
+}
+
+.navbar .search-container button {
+    float: right;
+    padding: 6px;
+    margin-top: 10px;
+    margin-right: 16px;
+    background: #A4243B;
+    color: #DFDFDF;
+    border: 2px solid #D8973C;
+    border-radius: 3px;
+}
+
+.current-subreddit {
+    align-content: center;
+    justify-content: center;
+    text-align: center;
+    color: #D8973C;
+}
+
+.post-title-container {
+    padding: 5px;
+}
+
+.post-list button {
+    text-decoration: none;
+    color: #F4F6F7;
+    background-color: transparent;
+    font-size: 17px;
+    border: none;
+    text-align: left;
+}
+
+.post-list button:hover, button:focus, button.visited {
+    color: #D8973C;
+}
+
+.post-list button:active {
+    border: none;
+    color: #D8973C;
+}

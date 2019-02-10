@@ -10,14 +10,14 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:extension.helloWorld"
+		"onCommand:redvis.start"
 	],
 	"main": "./extension.js",
 	"contributes": {
 		"commands": [
 			{
-				"command": "extension.helloWorld",
-				"title": "Hello World"
+				"command": "redvis.start",
+				"title": "Start RedVis"
 			}
 		]
 	},
@@ -31,5 +31,9 @@
 		"eslint": "^5.13.0",
 		"@types/node": "^10.12.21",
 		"@types/mocha": "^2.2.42"
+	},
+	"dependencies": {
+		"fetch": "^1.1.0",
+		"snoowrap": "^1.15.2"
 	}
 }
