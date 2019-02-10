@@ -57,3 +57,5 @@ Thank you to members of <a href="https://hacklahoma.org" target="_blank">Hacklah
 ### 1.0.0
 
 * Create RedVis tab and search subreddits to view top 25 posts
+
+* View specific post details including author and selftext
