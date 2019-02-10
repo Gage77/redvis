@@ -1,15 +1,15 @@
 body.vscode-light {
     background-color: #F4F6F7;
-    color: #212F3D;
+    color: #2F333B;
 }
 
 body.vscode-dark {
-    background-color: #212F3D;
+    background-color: #2F333B;
     color: #F4F6F7  ;
 }
 
 body.vscode-high-contrast {
-    background-color: #212F3D;
+    background-color: #2F333B;
     color: #F4F6F7;
 }
 
@@ -18,10 +18,32 @@ code {
     background-color: var(--vscode-editor-background);
 }
 
+a {
+    color: #EE4848;
+    text-decoration: none;
+}
+
+a.hover a.focus {
+    color: #EE4848;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+a.visited {
+    color: #AD3030;
+}
+
 .navbar {
     overflow: hidden;
-    background-color: #A4243B;
+    background-color: #EE4848;
     color: #F4F6F7;
+}
+
+.navbar .logo {
+    float: left;
+    height: 100px;
+    width: 100px;
+    cursor: pointer;
 }
 
 .navbar h1 {
@@ -31,6 +53,7 @@ code {
     margin-top: 10px;
     margin-left: 16px;
     font-size: 40px;
+    color: #F4F6F7;
 }
 
 .navbar .search-container {
@@ -51,17 +74,18 @@ code {
     padding: 6px;
     margin-top: 10px;
     margin-right: 16px;
-    background: #A4243B;
+    background: #EE4848;
     color: #DFDFDF;
-    border: 2px solid #D8973C;
+    border: 2px solid #DFDFDF;
     border-radius: 3px;
+    cursor: pointer;
 }
 
 .current-subreddit {
     align-content: center;
     justify-content: center;
     text-align: center;
-    color: #D8973C;
+    color: #EE4848;
 }
 
 .post-title-container {
@@ -75,13 +99,21 @@ code {
     font-size: 17px;
     border: none;
     text-align: left;
+    outline: none;
 }
 
-.post-list button:hover, button:focus, button.visited {
-    color: #D8973C;
+.post-list button:hover, button:focus {
+    color: #EE4848;
+    border: none;
+    outline: none;
+    cursor: pointer;
+}
+
+.post-list button.visited {
+    color: #AD3030;
 }
 
 .post-list button:active {
     border: none;
-    color: #D8973C;
+    color: #EE4848;
 }

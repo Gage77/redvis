@@ -1,14 +1,20 @@
 # RedVis README
 
+![RedVis](/static/RedVis.png?raw=true "RedVis")
+
 RedVis is a Visual Studio Code extension designed to allow users to browse top posts on specified subreddits without having to leave VS Code.
 
 ## Features
 
 * Browse the top posts of specified subreddits without having to leave VS Code
 
-* View details of specific post (post body, comments, etc.)
+* View details of specific post (selftext and author)
 
 ### Planned
+
+* Back button to return to post list view
+
+* View comments on post
 
 * Upvote/downvote posts and comments
 
@@ -28,7 +34,7 @@ RedVis relies on two npm packages, along with a config.json file that specifies 
 
 ### config.json structure
 
-Place a `config.json` file in the main project directory of this extension with information that can be acquired by registering for a <a href="https://www.reddit.com/register/" target="_blank">Reddit account</a> and creating a Reddit "app" <a href="https://ssl.reddit.com/prefs/apps/" target="_blank">here</a>.
+Place a `config.json` file in the main project directory of this extension with information that can be acquired by registering for a <a href="https://www.reddit.com/register/" target="_blank">Reddit account</a> and creating a Reddit "app" <a href="https://ssl.reddit.com/prefs/apps/" target="_blank">here</a>. Information on managing VS Code extensions can be found <a href="https://code.visualstudio.com/docs/editor/extension-gallery#_configuring-extensions" target="_blank">here</a>.
 
 ```json
 {

@@ -14,10 +14,68 @@ const r = new snoowrap({
 
 let postList = `<h2>Search for a subreddit above!</h2>`
 let currentSub = '/r/programmerhumor';
+let postDetailView = ``;
+let currentPost = '';
+
+// Add post comments to post detail view
+// function addCommentsToPostDetailView() {
+// 	r.getSubmission(postids[currentPost]).comments.fetchAll().then();
+// }
+
+// Construct post detail view
+function constructPostDetailView(postids) {
+	let detailViewConstruct = `<h1 class="current-post-title">${currentPost}</h1><hr>`;
+
+	// Get promise of selftext of selected post
+	let selftext = new Promise(function(resolve, reject) {
+		resolve(r.getSubmission(postids[currentPost]).selftext_html)
+		reject(`<h5>Error in getting post selftext</h5>`)
+	});
+
+	// Get promise of author of post
+	let author = new Promise(function(resolve, reject) {
+		resolve(r.getSubmission(postids[currentPost]).author.name)
+		reject(`<h3>Error in getting author</h3>`);
+	});
+
+	// Add details
+	author.then(function(val) {
+		detailViewConstruct += `<p class="current-post-author"><b>Author: </b>${val}</p>`;
+	});
+	selftext.then(function(val) {
+		detailViewConstruct += `<div class="post-self-text-details">` + val + `</div>`;
+		detailViewConstruct += `<hr>`;
+		postDetailView += detailViewConstruct;
+	});
+	return;
+}
+
+// Query for post
+function queryPostInfo(queryString) {
+	postDetailView = ``;
+	let postids = {};
+	currentPost = queryString;
+	if (currentPost == '') {
+		return;
+	}
+
+	// Get promise of hot 25 posts
+	// let gp = new Promise(function(resolve, reject) {
+	// 	resolve(r.getHot(currentSub))
+	// 	reject(console.log('error in fetching post details'));
+	// });
+
+	// TODO: Replace with promise functionality
+	r.getHot(currentSub).then((posts) => {
+		for (let i = 0; i < posts.length; i++) {
+			postids[posts[i].title] = posts[i].id;
+		}
+		constructPostDetailView(postids); 
+	});
+}
 
 // Construct post data from API response
 function constructPostList(res) {
-	console.log(currentSub);
 	let postListBody = `<h1 class="current-subreddit">/r/${currentSub}</h1><hr>`;
 	for (let i = 0; i < res.length; i++) {
 		postListBody += `<div class="post-title-container"><button class="post-title" value="${res[i]}" onclick="getPostDetails(this.value)">${res[i]}</button></div><br>`;
@@ -26,6 +84,7 @@ function constructPostList(res) {
 }
 
 // Query for subreddit (programmerhumor top by default)
+// TODO: Replace with promise functionaliity
 function getSubInfo(queryString) {
 	let titles = [];
 	currentSub = queryString;
@@ -36,8 +95,7 @@ function getSubInfo(queryString) {
 			for (let i = 0; i < posts.length; i++) {
 				titles.push(posts[i].title);
 			}
-			console.log(titles);
-			return constructPostList(titles);
+			constructPostList(titles);
 		});
 	}
 	// Otherwise get top of "/ProgrammerHumor"
@@ -47,14 +105,13 @@ function getSubInfo(queryString) {
 			for (let i = 0; i < posts.length; i++) {
 				titles.push(posts[i].title);
 			}
-			console.log(titles);
-			return constructPostList(titles);
+			constructPostList(titles);
 		});
 	}
 }
 
 // Get Webview HTML content
-function getWebviewContent(stylesheet, postList) {
+function getWebviewContent(stylesheet, logo, postInfo) {
 	return `<!DOCTYPE html>
 	<html lang="en">
 	<head>
@@ -99,14 +156,14 @@ function getWebviewContent(stylesheet, postList) {
 
 		<!----------------HTML elements-------------------->
 		<div class="navbar">
-			<h1 class="current-subreddit">RedVis</h1>
+			<a onclick="submitSearch()"><img title="Search /r/programmerhumor" alt="Search /r/programmerhumor" src="${logo}" class="logo"></a>
 			<div class="search-container">
 				<input type="text" placeholder="search" class="subreddit-search" id="subreddit-search-input">
-				<button type="submit" onclick="submitSearch()">Go</button>
+				<button type="submit" onclick="submitSearch()">Search</button>
 			</div>
 		</div>
 		<div class="post-list">
-			${postList}
+			${postInfo}
 		</div>
 	</body>
 	</html>`;
@@ -141,13 +198,18 @@ function activate(context) {
 		// set current panel to the newly created panel
 		currentPanel = panel;
 
-		const pathToDisk = vscode.Uri.file(
+		const pathToDiskStyle = vscode.Uri.file(
 			path.join(context.extensionPath, 'static', 'styles.css')
 		);
 
-		const stylesheet = pathToDisk.with({ scheme: 'vscode-resource' });
+		const pathToDiskLogo = vscode.Uri.file(
+			path.join(context.extensionPath, 'static', 'RedVis.png')
+		);
 
-		panel.webview.html = getWebviewContent(stylesheet, `<h3>Search for a subreddit above</h3>`);
+		const stylesheet = pathToDiskStyle.with({ scheme: 'vscode-resource' });
+		const logo = pathToDiskLogo.with({ scheme: 'vscode-resource'});
+
+		panel.webview.html = getWebviewContent(stylesheet, logo, `<h3>Search for a subreddit above</h3>`);
 
 		// Handle messages passed in from webview
 		panel.webview.onDidReceiveMessage(
@@ -161,12 +223,16 @@ function activate(context) {
 							vscode.window.showInformationMessage('Performing search of /r/' + message.text + ' ...');
 						getSubInfo(message.text);
 						setTimeout(function() {
-							panel.webview.html = getWebviewContent(stylesheet, postList);
+							panel.webview.html = getWebviewContent(stylesheet, logo, postList);
 						},1750);
 						return;
 					// Get the details of specified post
 					case 'doGetPostDetails':
 						vscode.window.showInformationMessage('Getting post details for "' + message.text + '" ...');
+						queryPostInfo(message.text);
+						setTimeout(function() {
+							panel.webview.html = getWebviewContent(stylesheet, logo, postDetailView);
+						}, 1750);
 						return;
 				}
 			},

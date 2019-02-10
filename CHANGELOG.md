@@ -3,5 +3,10 @@ All notable changes to the "redvis" extension will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
-## [Unreleased]
+## [1.0.0]
+
 - Initial release
+
+- Search for hot 25 posts of subreddits
+
+- View post details such as post selftext and post author
