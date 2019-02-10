@@ -1,48 +1,53 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 const vscode = require('vscode');
+const config = require('./config.json');
 const path = require('path');
 const snoowrap = require('snoowrap');
 
+
 const r = new snoowrap({
-	userAgent: 'RedVis',
-	clientId: 'imGYUvWguOfXVQ',
-	clientSecret: 'ICBGWy9jG6B27tpBMd8hHpaDozA',
-	username: 'Zeigmeyer',
-	password: '10488000'
+	userAgent: config.userAgent,
+	clientId: config.clientId,
+	clientSecret: config.clientSecret,
+	username: config.username,
+	password: config.password
 });
 
-// endpoint url
-// const endpoint = 'https://api.pushshift.io/reddit/subreddit/search/';
+// Construct post data from API response
+function constructPostList(qs, res) {
+	const postListBody = `<h2>${qs}</h2>`;
+	for (let i = 0; i < res.length; i++) {
+		postListBody.concat(`<a>${res[i]}</a><hr>`)
+	}
+}
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
-
-// Query for subreddit (reddit home top by default)
-function getSub(queryString) {
-	let posts = `<h3>Error in pulling posts</h3>`;
+// Query for subreddit (programmerhumor top by default)
+function getSubInfo(queryString) {
 	let titles = [];
 
 	// If subreddit name is provided
 	if (queryString != '') {
-		
-	}
-
-	// Otherwise get top of "/ProgrammerHumor"
-	else {
-		r.getHot('programmerhumor').then(posts => {
+		r.getHot(queryString).then((posts, queryString) => {
 			for (let i = 0; i < posts.length; i++) {
 				titles.push(posts[i].title);
 			}
-		}).then(() => {
 			console.log(titles);
+			return constructPostList(queryString, titles);
 		});
 	}
-	return posts;
+	// Otherwise get top of "/ProgrammerHumor"
+	else {
+		r.getHot('programmerhumor').then((posts, queryString) => {
+			for (let i = 0; i < posts.length; i++) {
+				titles.push(posts[i].title);
+			}
+			console.log(titles);
+			return constructPostList(queryString, titles);
+		});
+	}
 }
 
 // Get Webview HTML content
-function getWebviewContent(stylesheet) {
+function getWebviewContent(stylesheet, postList) {
 	return `<!DOCTYPE html>
 	<html lang="en">
 	<head>
@@ -51,7 +56,8 @@ function getWebviewContent(stylesheet) {
 		<link rel="stylesheet" href="${stylesheet}">
 	</head>
 	<body>
-		<script>
+	<!----------------SCRIPTS-------------------->
+	<script>
 			const vscode = acquireVsCodeApi();
 
 			window.addEventListener('message', event => {
@@ -76,11 +82,14 @@ function getWebviewContent(stylesheet) {
 
 		<!----------------HTML elements-------------------->
 		<div class="navbar">
-			<h1 class="current-subreddit">Current Subreddit</h1>
+			<h1 class="current-subreddit">RedVis</h1>
 			<div class="search-container">
 				<input type="text" placeholder="search" class="subreddit-search" id="subreddit-search-input">
 				<button type="submit" onclick="submitSearch()">Go</button>
 			</div>
+		</div>
+		<div class="post-list">
+			${postList}
 		</div>
 	</body>
 	</html>`;
@@ -121,7 +130,7 @@ function activate(context) {
 
 		const stylesheet = pathToDisk.with({ scheme: 'vscode-resource' });
 
-		panel.webview.html = getWebviewContent(stylesheet);
+		panel.webview.html = getWebviewContent(stylesheet, `<h3>Search for a subreddit above</h3>`);
 
 		// Handle messages passed in from webview
 		panel.webview.onDidReceiveMessage(
@@ -129,7 +138,8 @@ function activate(context) {
 				switch (message.command) {
 					case 'doSearch':
 						vscode.window.showInformationMessage('Performing search of /' + message.text + ' subreddit...');
-						getSub(message.text);
+						let postList = getSubInfo(message.text);
+						panel.webview.html = getWebviewContent(stylesheet, postList);
 						return;
 				}
 			},
@@ -150,6 +160,7 @@ function activate(context) {
 
 	context.subscriptions.push(disposable);
 }
+
 exports.activate = activate;
 
 // this method is called when your extension is deactivated

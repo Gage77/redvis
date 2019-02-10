@@ -4,8 +4,8 @@ body.vscode-light {
 }
 
 body.vscode-dark {
-    background-color: #343434;
-    color: #DFDFDF;
+    background-color: #273E47;
+    color: #D8C99B;
 }
 
 body.vscode-high-contrast {
@@ -20,7 +20,7 @@ code {
 
 .navbar {
     overflow: hidden;
-    background-color: #273E47;
+    background-color: #A4243B;
     color: #DFDFDF;
 }
 
