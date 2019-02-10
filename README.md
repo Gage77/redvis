@@ -36,7 +36,7 @@ Place a `config.json` file in the main project directory of this extension with 
 
 ## Known Issues
 
-Currently, RedVis does not protect against XSS and other user input based attacks. This is a planned feature.
+Currently, RedVis does not protect against XSS and other user input based attacks. This is a planned feature. Additionally, RedVis currently uses a manual time delay to ensure that the promise functions used to query the Reddit API can be processed. In the future, this extension will make full use of ES6 promise functions to prevent possible extension failures due to slow internet connections.
 
 ## Release Notes
 
