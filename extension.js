@@ -19,11 +19,14 @@ const r = new snoowrap(configInfo);
 const postsPerRequest = 50;
 const maxPostsToFetch =  250;
 const maxRequests = maxPostsToFetch / postsPerRequest;
+let stylesheet = '';
+let logo = '';
+let panel = '';
 
 const responses = [];
 
 const postList = `<p>Search for a subreddit above!</p>`
-let currentSub = '/r/funny';
+let currentSub = 'funny';
 // Post information detailed
 let postDetailView = '';
 let currentPost = '';
@@ -104,7 +107,7 @@ const fetchPostsFromSub = async (subreddit, afterParam) => {
 			fetchPostsFromSub(subreddit, responseJSON.data.after);
 			return;
 		}
-		parseSubSearchResults(responses);
+		parseSubSearchResults(responses, panel);
 	} catch (error) {
 		console.log(error);
 	}
@@ -122,6 +125,7 @@ const parseSubSearchResults = (responses) => {
 	allPosts.forEach(({ data: { title, id, author, score, selftext, ups, downs, url } }) => {
 		postInfo[id] = { 
 			title,
+			id,
 			author,
 			score,
 			selftext,
@@ -131,16 +135,20 @@ const parseSubSearchResults = (responses) => {
 		}
 	});
 
-	constructPostListView(postInfo);
+	return constructPostListView(postInfo, panel);
 }
 
 // Construct html for each post in list view
 const constructPostListView = (postInfo) => {
+	let postListView = `<p id="sub_${currentSub}" class="current-sub-header">r/${currentSub} {</p><div id="post_list_container" class="post-list-container">`;
 	for (var prop in postInfo) {
-		console.log(postInfo[prop]);
-		break;
+		postListView += 
+		`<div id="${postInfo[prop].id}" class="post-list-post-container">`
+			+ `<p>const <a href="${postInfo[prop].url}">title_${postInfo[prop].id}</a> = "${postInfo[prop].title}";</p>`
+		+ `</div>`;
 	}
-	console.log(Object.keys(postInfo).length);
+	postListView += `</div>`;	// closes post_list_container
+	panel.webview.html = getWebviewContent(stylesheet, logo, postListView);
 }
 
 // Get Webview HTML content
@@ -218,7 +226,7 @@ function activate(context) {
 
 	//----------COMMANDS----------//
 	let disposable = vscode.commands.registerCommand('redvis.start', function () {		
-		const panel = vscode.window.createWebviewPanel(
+		panel = vscode.window.createWebviewPanel(
 			'redvis',	// Type of webview (internal)
 			'RedVis',	// Title of panel displayed to user
 			vscode.ViewColumn.One,	// Column to show the new panel in
@@ -239,8 +247,8 @@ function activate(context) {
 			path.join(context.extensionPath, 'static', 'RedVis.png')
 		);
 
-		const stylesheet = pathToDiskStyle.with({ scheme: 'vscode-resource' });
-		const logo = pathToDiskLogo.with({ scheme: 'vscode-resource'});
+		stylesheet = pathToDiskStyle.with({ scheme: 'vscode-resource' });
+		logo = pathToDiskLogo.with({ scheme: 'vscode-resource'});
 
 		panel.webview.html = getWebviewContent(stylesheet, logo, `<p>Search for a subreddit above</p>`);
 
@@ -255,8 +263,12 @@ function activate(context) {
 						else
 							vscode.window.showInformationMessage('Performing search of /r/' + message.text + ' ...');
 						// TODO: propery handle async function below (i.e. put in try catch)
-						fetchPostsFromSub(message.text, null);
-						panel.webview.html = getWebviewContent(stylesheet, logo, postList);
+						try {
+							fetchPostsFromSub(message.text, null);
+							// panel.webview.html = getWebviewContent(stylesheet, logo, postSubFetchResponse);
+						} catch (error) {
+							console.log(error)
+						}
 						return;
 					// Get the details of specified post
 					case 'doGetPostDetails':

@@ -17,15 +17,17 @@ a {
     text-decoration: none;
 }
 
-a.hover a.focus {
+a:hover a:focus {
     color: #EE4848;
     text-decoration: none;
     cursor: pointer;
 }
 
-a.visited {
+a:visited a:active{
     color: #AD3030;
 }
+
+/*--------------- Navbar --------------- */
 
 .navbar {
     overflow: hidden;
@@ -64,6 +66,8 @@ a.visited {
     cursor: pointer;
 }
 
+/*--------- Post list view header ----------- */
+
 .current-subreddit {
     align-content: center;
     justify-content: center;
@@ -98,4 +102,23 @@ a.visited {
 .post-list button:active {
     border: none;
     color: #EE4848;
+}
+
+/*------------- Post list view --------------- */
+.post-list-container .post-list-post-container {
+    padding: 0;
+    margin: 0px;
+}
+
+.post-list-container .post-list-post-container a {
+
+}
+
+.post-list-container .post-list-post-container button {
+    text-decoration: none;
+    color: #F4F6F7;
+    background-color: transparent;
+    border: none;
+    text-align: left;
+    outline: none;
 }

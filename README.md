@@ -59,3 +59,7 @@ Follow progress at the RedVis [Trello Board](https://trello.com/b/pRauyhpj/redvi
 ### 1.0.0
 
 * Create RedVis tab and search subreddits to view top 25 posts
+
+### 2.0.0
+
+* Revised fetching to call Reddit api directly rather than use snoowrap (see [here](https://github.com/reddit-archive/reddit/wiki/JSON) for documentation on Reddit JSON returns)
