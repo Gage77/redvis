@@ -1,21 +1,15 @@
-body.vscode-light {
-    background-color: #F4F6F7;
-    color: #2F333B;
-}
-
-body.vscode-dark {
-    background-color: #2F333B;
-    color: #F4F6F7  ;
-}
-
-body.vscode-high-contrast {
-    background-color: #2F333B;
-    color: #F4F6F7;
-}
-
-code {
+body {
+    font-family: Consolas, "Courier New", monospace;
+    line-height: 19px;
+    letter-spacing: 0px;
+    font-size: 14px;
     color: var(--vscode-editor-foreground);
     background-color: var(--vscode-editor-background);
+}
+
+::selection {
+    background: var(--vscode-editor-selectionHighlightBackground);
+    color: var(--vscode-editor-selectionForeground);
 }
 
 a {
@@ -46,16 +40,6 @@ a.visited {
     cursor: pointer;
 }
 
-.navbar h1 {
-    float: left;
-    display: block;
-    text-align: center;
-    margin-top: 10px;
-    margin-left: 16px;
-    font-size: 40px;
-    color: #F4F6F7;
-}
-
 .navbar .search-container {
     float: right;
     margin-top: 10px;
@@ -65,7 +49,6 @@ a.visited {
     padding: 6px;
     margin-top: 10px;
     margin-right: 16px;
-    font-size: 17px;
     border: none;
 }
 
@@ -96,7 +79,6 @@ a.visited {
     text-decoration: none;
     color: #F4F6F7;
     background-color: transparent;
-    font-size: 17px;
     border: none;
     text-align: left;
     outline: none;

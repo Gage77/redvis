@@ -34,6 +34,7 @@
 	},
 	"dependencies": {
 		"fetch": "^1.1.0",
+		"node-fetch": "^2.3.0",
 		"snoowrap": "^1.15.2"
 	}
 }

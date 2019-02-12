@@ -1,42 +1,40 @@
+//-------------- includes -----------------//
 const vscode = require('vscode');
 const config = require('./config.json');
+const fetch = require('node-fetch');
 const path = require('path');
 const snoowrap = require('snoowrap');
 
-// Create snoowrap instance
-const r = new snoowrap({
-	userAgent: config.userAgent,
-	clientId: config.clientId,
-	clientSecret: config.clientSecret,
+//--------------- config ------------------//
+const configInfo = {
+	client_id: config.clientId,
+	client_secret: config.clientSecret,
 	username: config.username,
-	password: config.password
-});
+	password: config.password,
+	user_agent: config.userAgent
+};
 
-let postList = `<h2>Search for a subreddit above!</h2>`
-let currentSub = '/r/programmerhumor';
-let postDetailView = ``;
+//---------- constants / globals ----------//
+const r = new snoowrap(configInfo);
+const postsPerRequest = 50;
+const maxPostsToFetch =  250;
+const maxRequests = maxPostsToFetch / postsPerRequest;
+
+const responses = [];
+
+const postList = `<p>Search for a subreddit above!</p>`
+let currentSub = '/r/funny';
+// Post information detailed
+let postDetailView = '';
 let currentPost = '';
-
-// Add post comments to post detail view
-// function addCommentsToPostDetailView() {
-// 	r.getSubmission(postids[currentPost]).comments.fetchAll().then();
-// }
+let currentPostID = '';
+let currentPostTitle = '';
+let currentPostAuthor = '';
 
 // Construct post detail view
-function constructPostDetailView(postids) {
-	let detailViewConstruct = `<h1 class="current-post-title">${currentPost}</h1><hr>`;
-
-	// Get promise of selftext of selected post
-	let selftext = new Promise(function(resolve, reject) {
-		resolve(r.getSubmission(postids[currentPost]).selftext_html)
-		reject(`<h5>Error in getting post selftext</h5>`)
-	});
-
-	// Get promise of author of post
-	let author = new Promise(function(resolve, reject) {
-		resolve(r.getSubmission(postids[currentPost]).author.name)
-		reject(`<h3>Error in getting author</h3>`);
-	});
+function constructPostDetailView() {
+	let detailViewConstruct = `<p class="current-post-title">${currentPost}</p><hr>`;
+	console.log(currentPostID);
 
 	// Add details
 	author.then(function(val) {
@@ -52,62 +50,97 @@ function constructPostDetailView(postids) {
 
 // Query for post
 function queryPostInfo(queryString) {
-	postDetailView = ``;
+	postDetailView = '';
 	let postids = {};
-	currentPost = queryString;
-	if (currentPost == '') {
+	currentPostTitle = queryString;
+	if (currentPostTitle == '') {
 		return;
 	}
-
-	// Get promise of hot 25 posts
-	// let gp = new Promise(function(resolve, reject) {
-	// 	resolve(r.getHot(currentSub))
-	// 	reject(console.log('error in fetching post details'));
-	// });
 
 	// TODO: Replace with promise functionality
 	r.getHot(currentSub).then((posts) => {
 		for (let i = 0; i < posts.length; i++) {
 			postids[posts[i].title] = posts[i].id;
 		}
-		constructPostDetailView(postids); 
+		currentPostID = postids[currentPostTitle];
+		let pullPost = new Promise(function(resolve, reject) {
+			resolve(r.getSubmission(currentPostID));
+		});
+
+		pullPost.then((val) => {
+			currentPost = val;
+			processPost();
+		});
+		// constructPostDetailView(); 
 	});
+}
+
+function processPost() {
+	console.log(currentPost);
+	console.log(currentPost.author.name);
 }
 
 // Construct post data from API response
 function constructPostList(res) {
-	let postListBody = `<h1 class="current-subreddit">/r/${currentSub}</h1><hr>`;
+	let postListBody = `<p class="current-subreddit">/r/${currentSub}</p><hr>`;
 	for (let i = 0; i < res.length; i++) {
 		postListBody += `<div class="post-title-container"><button class="post-title" value="${res[i]}" onclick="getPostDetails(this.value)">${res[i]}</button></div><br>`;
 	}
 	postList = postListBody;
 }
 
-// Query for subreddit (programmerhumor top by default)
-// TODO: Replace with promise functionaliity
-function getSubInfo(queryString) {
-	let titles = [];
-	currentSub = queryString;
+// Query for subreddit posts (funny by default)
+const fetchPostsFromSub = async (subreddit, afterParam) => {
+	if (subreddit == '') {
+		subreddit = 'funny';
+	}
 
-	// If subreddit name is provided
-	if (currentSub != '') {
-		r.getHot(queryString).then((posts) => {
-			for (let i = 0; i < posts.length; i++) {
-				titles.push(posts[i].title);
-			}
-			constructPostList(titles);
-		});
+	try {
+		const response = await fetch(`https://www.reddit.com/r/${subreddit}.json?limit=${postsPerRequest}${afterParam ? '&afterParam=' + afterParam : ''}`)
+		const responseJSON = await response.json();
+		responses.push(responseJSON);
+		// Recursively fetch until we get maxRequests posts
+		if(responseJSON.data.after && responses.length < maxRequests) {
+			fetchPostsFromSub(subreddit, responseJSON.data.after);
+			return;
+		}
+		parseSubSearchResults(responses);
+	} catch (error) {
+		console.log(error);
 	}
-	// Otherwise get top of "/ProgrammerHumor"
-	else {
-		currentSub = 'programmerhumor'
-		r.getHot(currentSub).then((posts) => {
-			for (let i = 0; i < posts.length; i++) {
-				titles.push(posts[i].title);
-			}
-			constructPostList(titles);
-		});
+}
+
+// Parse json response from subreddit search
+const parseSubSearchResults = (responses) => {
+	const allPosts = [];
+	responses.forEach(response => {
+		allPosts.push(...response.data.children);
+	});
+
+	postInfo = {};
+
+	allPosts.forEach(({ data: { title, id, author, score, selftext, ups, downs, url } }) => {
+		postInfo[id] = { 
+			title,
+			author,
+			score,
+			selftext,
+			ups,
+			downs,
+			url
+		}
+	});
+
+	constructPostListView(postInfo);
+}
+
+// Construct html for each post in list view
+const constructPostListView = (postInfo) => {
+	for (var prop in postInfo) {
+		console.log(postInfo[prop]);
+		break;
 	}
+	console.log(Object.keys(postInfo).length);
 }
 
 // Get Webview HTML content
@@ -209,7 +242,7 @@ function activate(context) {
 		const stylesheet = pathToDiskStyle.with({ scheme: 'vscode-resource' });
 		const logo = pathToDiskLogo.with({ scheme: 'vscode-resource'});
 
-		panel.webview.html = getWebviewContent(stylesheet, logo, `<h3>Search for a subreddit above</h3>`);
+		panel.webview.html = getWebviewContent(stylesheet, logo, `<p>Search for a subreddit above</p>`);
 
 		// Handle messages passed in from webview
 		panel.webview.onDidReceiveMessage(
@@ -218,13 +251,12 @@ function activate(context) {
 					// Search subreddit for hot posts (25)
 					case 'doSearch':
 						if (message.text == '')
-							vscode.window.showInformationMessage('Performing default search of "/r/programmerhumor" ...');
+							vscode.window.showInformationMessage('Performing default search of "/r/funny" ...');
 						else
 							vscode.window.showInformationMessage('Performing search of /r/' + message.text + ' ...');
-						getSubInfo(message.text);
-						setTimeout(function() {
-							panel.webview.html = getWebviewContent(stylesheet, logo, postList);
-						},1750);
+						// TODO: propery handle async function below (i.e. put in try catch)
+						fetchPostsFromSub(message.text, null);
+						panel.webview.html = getWebviewContent(stylesheet, logo, postList);
 						return;
 					// Get the details of specified post
 					case 'doGetPostDetails':
