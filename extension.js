@@ -1,21 +1,10 @@
 //-------------- includes -----------------//
 const vscode = require('vscode');
-const config = require('./config.json');
 const fetch = require('node-fetch');
 const path = require('path');
 const snoowrap = require('snoowrap');
 
-//--------------- config ------------------//
-const configInfo = {
-	client_id: config.clientId,
-	client_secret: config.clientSecret,
-	username: config.username,
-	password: config.password,
-	user_agent: config.userAgent
-};
-
 //---------- constants / globals ----------//
-const r = new snoowrap(configInfo);
 const postsPerRequest = 50;
 const maxPostsToFetch =  250;
 const maxRequests = maxPostsToFetch / postsPerRequest;
@@ -34,69 +23,13 @@ let currentPostID = '';
 let currentPostTitle = '';
 let currentPostAuthor = '';
 
-// Construct post detail view
-function constructPostDetailView() {
-	let detailViewConstruct = `<p class="current-post-title">${currentPost}</p><hr>`;
-	console.log(currentPostID);
-
-	// Add details
-	author.then(function(val) {
-		detailViewConstruct += `<p class="current-post-author"><b>Author: </b>${val}</p>`;
-	});
-	selftext.then(function(val) {
-		detailViewConstruct += `<div class="post-self-text-details">` + val + `</div>`;
-		detailViewConstruct += `<hr>`;
-		postDetailView += detailViewConstruct;
-	});
-	return;
-}
-
-// Query for post
-function queryPostInfo(queryString) {
-	postDetailView = '';
-	let postids = {};
-	currentPostTitle = queryString;
-	if (currentPostTitle == '') {
-		return;
-	}
-
-	// TODO: Replace with promise functionality
-	r.getHot(currentSub).then((posts) => {
-		for (let i = 0; i < posts.length; i++) {
-			postids[posts[i].title] = posts[i].id;
-		}
-		currentPostID = postids[currentPostTitle];
-		let pullPost = new Promise(function(resolve, reject) {
-			resolve(r.getSubmission(currentPostID));
-		});
-
-		pullPost.then((val) => {
-			currentPost = val;
-			processPost();
-		});
-		// constructPostDetailView(); 
-	});
-}
-
-function processPost() {
-	console.log(currentPost);
-	console.log(currentPost.author.name);
-}
-
-// Construct post data from API response
-function constructPostList(res) {
-	let postListBody = `<p class="current-subreddit">/r/${currentSub}</p><hr>`;
-	for (let i = 0; i < res.length; i++) {
-		postListBody += `<div class="post-title-container"><button class="post-title" value="${res[i]}" onclick="getPostDetails(this.value)">${res[i]}</button></div><br>`;
-	}
-	postList = postListBody;
-}
-
 // Query for subreddit posts (funny by default)
 const fetchPostsFromSub = async (subreddit, afterParam) => {
 	if (subreddit == '') {
 		subreddit = 'funny';
 	}
+
+	currentSub = subreddit;
 
 	try {
 		const response = await fetch(`https://www.reddit.com/r/${subreddit}.json?limit=${postsPerRequest}${afterParam ? '&afterParam=' + afterParam : ''}`)
@@ -107,7 +40,7 @@ const fetchPostsFromSub = async (subreddit, afterParam) => {
 			fetchPostsFromSub(subreddit, responseJSON.data.after);
 			return;
 		}
-		parseSubSearchResults(responses, panel);
+		parseSubSearchResults(responses);
 	} catch (error) {
 		console.log(error);
 	}
@@ -120,7 +53,7 @@ const parseSubSearchResults = (responses) => {
 		allPosts.push(...response.data.children);
 	});
 
-	postInfo = {};
+	let postInfo = {};
 
 	allPosts.forEach(({ data: { title, id, author, score, selftext, ups, downs, url } }) => {
 		postInfo[id] = { 
@@ -135,19 +68,36 @@ const parseSubSearchResults = (responses) => {
 		}
 	});
 
-	return constructPostListView(postInfo, panel);
+	return constructPostListView(postInfo);
 }
 
 // Construct html for each post in list view
 const constructPostListView = (postInfo) => {
-	let postListView = `<p id="sub_${currentSub}" class="current-sub-header">r/${currentSub} {</p><div id="post_list_container" class="post-list-container">`;
+	let postListView = `<button class="collapse-post-list" onclick="collapsePostList()">-</button>
+		<p id="sub_${currentSub}" class="current-sub-header">
+			<span class="variable-color">const </span>
+			<span class="function-color">fetch_sub_r/${currentSub} </span>
+			<span class="operator-color">= </span>
+			<span class="bracket-color">() </span>
+			<span class="variable-color">=> </span> 
+			<span class="bracket-color">{</span>
+		</p>
+		<div id="post_list_container" class="post-list-container">`;
 	for (var prop in postInfo) {
 		postListView += 
-		`<div id="${postInfo[prop].id}" class="post-list-post-container">`
-			+ `<p>const <a href="${postInfo[prop].url}">title_${postInfo[prop].id}</a> = "${postInfo[prop].title}";</p>`
-		+ `</div>`;
+		`<div id="${postInfo[prop].id}" class="post-list-post-container">
+			<p>
+				<span class="keyword-color">const </span>
+				<span class="variable-color">
+					<a href="${postInfo[prop].url}">title_${postInfo[prop].id}</a>
+				</span> = 
+				<span class="string-color">
+					"${postInfo[prop].title}"
+				</span>;
+			</p>
+		</div>`;
 	}
-	postListView += `</div>`;	// closes post_list_container
+	postListView += `</div><span class="bracket-color">}</span>`;	// closes post_list_container
 	panel.webview.html = getWebviewContent(stylesheet, logo, postListView);
 }
 
@@ -159,6 +109,7 @@ function getWebviewContent(stylesheet, logo, postInfo) {
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link rel="stylesheet" href="${stylesheet}">
+		<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
 	</head>
 	<body>
 	<!----------------SCRIPTS-------------------->
@@ -192,6 +143,17 @@ function getWebviewContent(stylesheet, logo, postInfo) {
 			// Get details on specified post
 			function getPostDetails(postTitle) {
 				handleMessageSending(postTitle, 'doGetPostDetails');
+			}
+
+			// Collapse the post-list view 
+			function collapsePostList() {
+				divid = document.getElementById("post_list_container");
+				if (divid.style.display === "none") {
+					divid.style.display = "block";
+				}
+				else {
+					divid.style.display = "none";
+				}
 			}
 		</script>
 

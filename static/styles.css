@@ -3,8 +3,8 @@ body {
     line-height: 19px;
     letter-spacing: 0px;
     font-size: 14px;
-    color: var(--vscode-editor-foreground);
-    background-color: var(--vscode-editor-background);
+    color: #cdd3de;
+    background-color: #1b2b34;
 }
 
 ::selection {
@@ -13,18 +13,19 @@ body {
 }
 
 a {
-    color: #EE4848;
+    color: #F4F6F7;
     text-decoration: none;
 }
 
-a:hover a:focus {
-    color: #EE4848;
+a:hover, a:focus {
+    color: #F4F6F7;
     text-decoration: none;
     cursor: pointer;
 }
 
-a:visited a:active{
-    color: #AD3030;
+a:visited, a:active{
+    color: #F4F6F7;
+    outline: none;
 }
 
 /*--------------- Navbar --------------- */
@@ -68,57 +69,88 @@ a:visited a:active{
 
 /*--------- Post list view header ----------- */
 
-.current-subreddit {
-    align-content: center;
-    justify-content: center;
-    text-align: center;
-    color: #EE4848;
+p.current-sub-header {
+    padding-left: 10px;
+    display: inline-block;
 }
 
-.post-title-container {
-    padding: 5px;
-}
-
-.post-list button {
-    text-decoration: none;
-    color: #F4F6F7;
+button.collapse-post-list {
     background-color: transparent;
-    border: none;
-    text-align: left;
+    width: 10px;
+    height: 10px;
+    border: 1px solid grey;
+    padding: 0;
+    color: grey;
+    line-height: 7px;
+}
+
+button.collapse-post-list:active {
     outline: none;
+    background-color: transparent;
+    border: 1px solid grey;
 }
 
-.post-list button:hover, button:focus {
-    color: #EE4848;
-    border: none;
-    outline: none;
-    cursor: pointer;
-}
-
-.post-list button.visited {
-    color: #AD3030;
-}
-
-.post-list button:active {
-    border: none;
-    color: #EE4848;
+button.collapse-post-list:focus {
+    outline: 0;
 }
 
 /*------------- Post list view --------------- */
-.post-list-container .post-list-post-container {
+.post-list-container {
+    padding-left: 60px;
+}
+
+.post-list-post-container {
     padding: 0;
     margin: 0px;
 }
 
-.post-list-container .post-list-post-container a {
-
-}
-
-.post-list-container .post-list-post-container button {
+.post-list-post-container button {
     text-decoration: none;
     color: #F4F6F7;
     background-color: transparent;
     border: none;
     text-align: left;
     outline: none;
+}
+
+.post-list-post-container p {
+    padding: 1;
+    margin: 0px;
+}
+
+
+
+
+
+/*------------- keyword color overrides --------------- */
+.keyword-color {
+    color: #C594C5;
+}
+
+.variable-color {
+    color: #C594C5;
+}
+
+.string-color {
+    color: #99C794;
+}
+
+.comment-color {
+    color: #65737e;
+}
+
+.function-color {
+    color: #6699CC;
+}
+
+.class-color {
+    color: #FAC863;
+}
+
+.bracket-color {
+    color: yellow;
+}
+
+.operator-color {
+    color: #5FB3B3;
 }
