@@ -17,11 +17,27 @@ const responses = [];
 const postList = `<p>Search for a subreddit above!</p>`
 let currentSub = 'funny';
 // Post information detailed
-let postDetailView = '';
-let currentPost = '';
 let currentPostID = '';
 let currentPostTitle = '';
 let currentPostAuthor = '';
+
+// Query for individual post details
+const fetchPostDetail = async (postid) => {
+	try {
+		const response = await fetch(`https://www.reddit.com/r/comments/${postid}.json`);
+		const responseJSON = await response.json();
+		parsePostDetails(responseJSON);
+	} catch (error) {
+		console.log(error);
+	}
+}
+
+// Parse json response of post details
+const parsePostDetails = (response) => {
+	const postBody = {};
+	const postComments = [];
+	console.log('made it');
+}
 
 // Query for subreddit posts (funny by default)
 const fetchPostsFromSub = async (subreddit, afterParam) => {
@@ -32,7 +48,7 @@ const fetchPostsFromSub = async (subreddit, afterParam) => {
 	currentSub = subreddit;
 
 	try {
-		const response = await fetch(`https://www.reddit.com/r/${subreddit}.json?limit=${postsPerRequest}${afterParam ? '&afterParam=' + afterParam : ''}`)
+		const response = await fetch(`https://www.reddit.com/r/${subreddit}.json?limit=${postsPerRequest}${afterParam ? '&afterParam=' + afterParam : ''}`);
 		const responseJSON = await response.json();
 		responses.push(responseJSON);
 		// Recursively fetch until we get maxRequests posts
@@ -87,13 +103,16 @@ const constructPostListView = (postInfo) => {
 		postListView += 
 		`<div id="${postInfo[prop].id}" class="post-list-post-container">
 			<p>
-				<span class="keyword-color">const </span>
+				<span class="keyword-color">let </span>
 				<span class="variable-color">
-					<a href="${postInfo[prop].url}">title_${postInfo[prop].id}</a>
+					<a href="#" onclick="getPostDetails(${postInfo[prop].id})">title_${postInfo[prop].id}</a>
 				</span> = 
 				<span class="string-color">
-					"${postInfo[prop].title}"
-				</span>;
+					<span class="bracket-color">(</span>
+					"${postInfo[prop].title}",
+					<span class="argument-color">${postInfo[prop].author}</span>
+					<span class="bracket-color">)</span>
+					</span>;
 			</p>
 		</div>`;
 	}
@@ -141,8 +160,8 @@ function getWebviewContent(stylesheet, logo, postInfo) {
 			}
 			
 			// Get details on specified post
-			function getPostDetails(postTitle) {
-				handleMessageSending(postTitle, 'doGetPostDetails');
+			function getPostDetails(postid) {
+				handleMessageSending(postid, 'doGetPostDetails');
 			}
 
 			// Collapse the post-list view 
@@ -225,20 +244,17 @@ function activate(context) {
 						else
 							vscode.window.showInformationMessage('Performing search of /r/' + message.text + ' ...');
 						// TODO: propery handle async function below (i.e. put in try catch)
-						try {
-							fetchPostsFromSub(message.text, null);
-							// panel.webview.html = getWebviewContent(stylesheet, logo, postSubFetchResponse);
-						} catch (error) {
-							console.log(error)
-						}
+						fetchPostsFromSub(message.text, null);
+						// try {
+						// 	fetchPostsFromSub(message.text, null);
+						// } catch (error) {
+						// 	console.log(error)
+						// }
 						return;
 					// Get the details of specified post
 					case 'doGetPostDetails':
-						vscode.window.showInformationMessage('Getting post details for "' + message.text + '" ...');
-						queryPostInfo(message.text);
-						setTimeout(function() {
-							panel.webview.html = getWebviewContent(stylesheet, logo, postDetailView);
-						}, 1750);
+						vscode.window.showInformationMessage('Getting post details for iD: "' + message.text + '" ...');
+						fetchPostDetail(message.text);
 						return;
 				}
 			},

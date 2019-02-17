@@ -154,3 +154,7 @@ button.collapse-post-list:focus {
 .operator-color {
     color: #5FB3B3;
 }
+
+.argument-color {
+    color: #F99157;
+}
