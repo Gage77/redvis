@@ -24,7 +24,7 @@ RedVis is a Visual Studio Code extension designed to allow users to browse top p
 
 ## Requirements
 
-RedVis relies on two npm packages, along with a config.json file that specifies auth details for querying the Reddit API.
+RedVis relies on two npm packages
 
 ### Npm packages
 
@@ -32,23 +32,9 @@ RedVis relies on two npm packages, along with a config.json file that specifies 
 
 * <a href="https://www.npmjs.com/package/node-fetch" target="_blank">node-fetch</a>
 
-### config.json structure
-
-Place a `config.json` file in the main project directory of this extension with information that can be acquired by registering for a <a href="https://www.reddit.com/register/" target="_blank">Reddit account</a> and creating a Reddit "app" <a href="https://ssl.reddit.com/prefs/apps/" target="_blank">here</a>. Information on managing VS Code extensions can be found <a href="https://code.visualstudio.com/docs/editor/extension-gallery#_configuring-extensions" target="_blank">here</a>.
-
-```json
-{
-    "userAgent": "name-of-app",
-    "clientId": "client-id",
-    "clientSecret": "client-secret",
-    "username": "reddit-account-username",
-    "password": "reddit-account-password"
-}
-```
-
 ## Known Issues
 
-Currently, RedVis does not protect against XSS and other user input based attacks. This is a planned feature. Additionally, RedVis currently uses a manual time delay to ensure that the promise functions used to query the Reddit API can be processed. In the future, this extension will make full use of ES6 promise functions to prevent possible extension failures due to slow internet connections.
+Currently, RedVis does not protect against XSS and other user input based attacks. This is a planned feature.
 
 ## Release Notes
 
