@@ -10,3 +10,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - Search for hot 25 posts of subreddits
 
 - View post details such as post selftext and post author
+
+## [2.0.0]
+
+- Polling Reddit directly for post lists now, rather than using snoowrap
+
+- Major style changes to be more in line with how text editors normally appear (currently using hardcoded color values)

@@ -30,7 +30,7 @@ RedVis relies on two npm packages, along with a config.json file that specifies 
 
 * <a href="https://www.npmjs.com/package/path" target="_blank">path</a>
 
-* <a href="https://www.npmjs.com/package/snoowrap" target="_blank">snoowrap</a>
+* <a href="https://www.npmjs.com/package/node-fetch" target="_blank">node-fetch</a>
 
 ### config.json structure
 
@@ -54,8 +54,12 @@ Currently, RedVis does not protect against XSS and other user input based attack
 
 Thank you to members of <a href="https://hacklahoma.org" target="_blank">Hacklahoma</a> for putting on the Hackathon during which I coded this extension!
 
+Follow progress at the RedVis [Trello Board](https://trello.com/b/pRauyhpj/redvis)
+
 ### 1.0.0
 
 * Create RedVis tab and search subreddits to view top 25 posts
 
-* View specific post details including author and selftext
+### 2.0.0
+
+* Revised fetching to call Reddit api directly rather than use snoowrap (see [here](https://github.com/reddit-archive/reddit/wiki/JSON) for documentation on Reddit JSON returns)
