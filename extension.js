@@ -2,7 +2,6 @@
 const vscode = require('vscode');
 const fetch = require('node-fetch');
 const path = require('path');
-const snoowrap = require('snoowrap');
 
 //---------- constants / globals ----------//
 const postsPerRequest = 50;
