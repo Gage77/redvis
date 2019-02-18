@@ -24,7 +24,7 @@ RedVis is a Visual Studio Code extension designed to allow users to browse top p
 
 ## Requirements
 
-RedVis relies on two npm packages, along with a config.json file that specifies auth details for querying the Reddit API.
+RedVis relies on two npm packages
 
 ### Npm packages
 
