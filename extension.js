@@ -23,20 +23,50 @@ let currentPostAuthor = '';
 
 // Query for individual post details
 const fetchPostDetail = async (postid) => {
+	let postBody = []
 	try {
-		const response = await fetch(`https://www.reddit.com/r/comments/${postid}.json`);
+		const response = await fetch(`https://www.reddit.com/r/${currentSub}/comments/${postid}.json`);
 		const responseJSON = await response.json();
-		parsePostDetails(responseJSON);
+		for (var prop in responseJSON) {
+			postBody.push(responseJSON[prop]);
+		}
+		parsePostDetails(postBody);
 	} catch (error) {
 		console.log(error);
 	}
 }
 
 // Parse json response of post details
-const parsePostDetails = (response) => {
-	const postBody = {};
-	const postComments = [];
-	console.log('made it');
+const parsePostDetails = (body) => {
+	let postBodyChildren = body[0].data.children[0];
+	let postInfo = body[0].data.children[0].data;
+
+	let postComments = {}
+	let postCommentList = body[1].data.children
+
+	constructPostDetailView(postInfo, postComments);
+}
+
+// Construct html view of post details
+const constructPostDetailView = (postInfo, postComments) => {
+	// Post body
+	let postDetailView = `<span class="keyword-color">const </span><span class="variable-color">postConfig </span><span class="operator-color">= </span><span class="bracket-color">{</span>
+		<div class="post-detail-config">
+			<p><span class="string-color">'postid'</span><span class="operator-color">:</span> <span class="string-color">'${postInfo.id}'</span><span class="operator-color">,</span></p>
+			<p><span class="string-color">'author'</span><span class="operator-color">:</span> <span class="string-color">'${postInfo.author}'</span><span class="operator-color">,</span></p>
+			<p><span class="string-color">'title'</span><span class="operator-color">:</span> <span class="string-color">'${postInfo.title}'</span><span class="operator-color">,</span></p>
+			<p><span class="string-color">'selftext'</span><span class="operator-color">:</span> <span class="string-color">'${postInfo.selftext}'</span><span class="operator-color">,</span></p>
+			<p><span class="string-color">'score'</span><span class="operator-color">:</span> <span class="argument-color">${postInfo.score}</span><span class="operator-color">,</span></p>
+			<p><span class="string-color">'upvotes'</span><span class="operator-color">:</span> <span class="argument-color">${postInfo.ups}</span><span class="operator-color">,</span></p>
+			<p><span class="string-color">'downvotes'</span><span class="operator-color">:</span> <span class="argument-color">${postInfo.downs}</span><span class="operator-color">,</span></p>
+			<a class="post-url" href="https://www.reddit.com${postInfo.permalink}"><span class="string-color">'permalink'</span><span class="operator-color">:</span> <span class="string-color">'https://www.reddit.com${postInfo.permalink}'</span><span class="operator-color">,</span></a>
+		</div>
+	<span class="bracket-color">}</span><br/>`;
+
+	// Post comments
+
+
+	panel.webview.html = getWebviewContent(stylesheet, logo, postDetailView);
 }
 
 // Query for subreddit posts (funny by default)
@@ -91,11 +121,11 @@ const parseSubSearchResults = (responses) => {
 const constructPostListView = (postInfo) => {
 	let postListView = `<button class="collapse-post-list" onclick="collapsePostList()">-</button>
 		<p id="sub_${currentSub}" class="current-sub-header">
-			<span class="variable-color">const </span>
+			<span class="keyword-color">const </span>
 			<span class="function-color">fetch_sub_r/${currentSub} </span>
 			<span class="operator-color">= </span>
 			<span class="bracket-color">() </span>
-			<span class="variable-color">=> </span> 
+			<span class="keyword-color">=> </span> 
 			<span class="bracket-color">{</span>
 		</p>
 		<div id="post_list_container" class="post-list-container">`;
@@ -105,14 +135,11 @@ const constructPostListView = (postInfo) => {
 			<p>
 				<span class="keyword-color">let </span>
 				<span class="variable-color">
-					<a href="#" onclick="getPostDetails(${postInfo[prop].id})">title_${postInfo[prop].id}</a>
+					<a href="#" onclick="getPostDetails(this.innerHTML)">${postInfo[prop].id}</a>
 				</span> = 
 				<span class="string-color">
-					<span class="bracket-color">(</span>
-					"${postInfo[prop].title}",
-					<span class="argument-color">${postInfo[prop].author}</span>
-					<span class="bracket-color">)</span>
-					</span>;
+					<span class="bracket-color">(</span>"${postInfo[prop].title}",<span class="argument-color">${postInfo[prop].author}</span><span class="bracket-color">)</span>
+				</span>;
 			</p>
 		</div>`;
 	}
@@ -245,15 +272,10 @@ function activate(context) {
 							vscode.window.showInformationMessage('Performing search of /r/' + message.text + ' ...');
 						// TODO: propery handle async function below (i.e. put in try catch)
 						fetchPostsFromSub(message.text, null);
-						// try {
-						// 	fetchPostsFromSub(message.text, null);
-						// } catch (error) {
-						// 	console.log(error)
-						// }
 						return;
 					// Get the details of specified post
 					case 'doGetPostDetails':
-						vscode.window.showInformationMessage('Getting post details for iD: "' + message.text + '" ...');
+						vscode.window.showInformationMessage('Getting post details for id: "' + message.text + '" ...');
 						fetchPostDetail(message.text);
 						return;
 				}

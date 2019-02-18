@@ -21,11 +21,14 @@ a:hover, a:focus {
     color: #F4F6F7;
     text-decoration: none;
     cursor: pointer;
+    outline: none;
+    border: none;
 }
 
 a:visited, a:active{
     color: #F4F6F7;
     outline: none;
+    border: none;
 }
 
 /*--------------- Navbar --------------- */
@@ -100,8 +103,9 @@ button.collapse-post-list:focus {
 }
 
 .post-list-post-container {
-    padding: 0;
-    margin: 0px;
+    padding: 0px;
+    margin-top: 2px;
+    margin-bottom: 0px;
 }
 
 .post-list-post-container button {
@@ -114,13 +118,30 @@ button.collapse-post-list:focus {
 }
 
 .post-list-post-container p {
-    padding: 1;
+    padding-left: 0px;
+    padding-right: 0px;
     margin: 0px;
 }
 
+/*----------------- post detail view ------------------ */
 
+.post-detail-config {
+    margin-left: 40px;
+    padding-top: 0px;
+}
 
+.post-detail-config p {
+    margin-top: 2px;
+    margin-bottom: 0px;
+    padding: 0px;
+}
 
+.post-detail-config a {
+    display: block;
+    margin-top: 2px;
+    margin-bottom: 0px;
+    padding: 0px;
+}
 
 /*------------- keyword color overrides --------------- */
 .keyword-color {
@@ -128,7 +149,7 @@ button.collapse-post-list:focus {
 }
 
 .variable-color {
-    color: #C594C5;
+    color: #F4F6F7;
 }
 
 .string-color {
@@ -148,7 +169,11 @@ button.collapse-post-list:focus {
 }
 
 .bracket-color {
-    color: yellow;
+    color: #FAC863;
+    padding-left: 0px;
+    padding-right: 0px;
+    margin-left: 0px;
+    margin-right: 0px;
 }
 
 .operator-color {
