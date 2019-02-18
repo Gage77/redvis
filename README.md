@@ -34,7 +34,12 @@ RedVis relies on two npm packages
 
 ## Known Issues
 
-Currently, RedVis does not protect against XSS and other user input based attacks. This is a planned feature.
+* [enhancement] Scrub user search for xss ([#7][i7])
+
+* [bug] Searching for multiple subs appends new sub listing to bottom of current ([#8][i8])
+
+[i7]: https://github.com/Gage77/redvis/issues/7
+[i8]: https://github.com/Gage77/redvis/issues/8
 
 ## Release Notes
 
