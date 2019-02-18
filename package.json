@@ -2,6 +2,7 @@
 	"name": "redvis",
 	"displayName": "RedVis",
 	"description": "Browse Reddit in VS Code",
+	"publisher": "gage77",
 	"version": "2.0.0",
 	"icon": "./static/RedVis_icon.png",
 	"repository": "https://github.com/Gage77/redvis",
