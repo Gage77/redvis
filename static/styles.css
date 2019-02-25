@@ -70,6 +70,18 @@ a:visited, a:active{
     cursor: pointer;
 }
 
+#stylistic_search_input {
+    background-color: transparent;
+    border-color: transparent;
+}
+
+#stylistic_search_function {
+    margin-top: 0px;
+    margin-bottom: 0px;
+    margin-left: 40px;
+    padding: 0;
+}
+
 /*--------- Post list view header ----------- */
 
 p.current-sub-header {

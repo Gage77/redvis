@@ -13,7 +13,7 @@ let panel = '';
 
 const responses = [];
 
-const postList = `<p>Search for a subreddit above!</p>`
+const postList = `<p><span class="keyword-color">const </span><span class="variable-color">helpText </span><span class="operator-color">= </span><span class="string-color">'Search for a subreddit above!'</span></p>`
 let currentSub = 'funny';
 // Post information detailed
 let currentPostID = '';
@@ -180,8 +180,8 @@ function getWebviewContent(stylesheet, logo, postInfo) {
 			}
 
 			// Search 
-			function submitSearch() {
-				const searchFieldText = document.getElementById('subreddit-search-input').value;
+			function submitSearch(subreddit_search_input) {
+				const searchFieldText = document.getElementById(subreddit_search_input).value;
 				handleMessageSending(searchFieldText, 'doSearch');
 			}
 			
@@ -205,11 +205,27 @@ function getWebviewContent(stylesheet, logo, postInfo) {
 		<!----------------HTML elements-------------------->
 		<button class="collapse-post-list move-left" onclick=collapseDiv('redvis_nav')>-</button>
 		<div class="navbar" id="redvis_nav">
-			<a onclick="submitSearch()"><img title="Search /r/programmerhumor" alt="Search /r/programmerhumor" src="${logo}" class="logo"></a>
+			<a onclick="submitSearch('subreddit_search_input')"><img title="Search /r/programmerhumor" alt="Search /r/programmerhumor" src="${logo}" class="logo"></a>
 			<div class="search-container">
-				<input type="text" placeholder="search" class="subreddit-search" id="subreddit-search-input">
-				<button type="submit" onclick="submitSearch()">Search</button>
+				<input type="text" placeholder="search" class="subreddit-search" id="subreddit_search_input">
+				<button type="submit" onclick=submitSearch('subreddit_search_input')>Search</button>
 			</div>
+		</div>
+		<div id="stylistic_search">
+			<p>
+				<span class="keyword-color">function </span>
+				<span class="function-color">searchForSub </span>
+				<span class="bracket-color">(</span><span class="argument-color">subreddit</span>
+				<span class="operator-color">=</span>
+				<span class="string-color">'</span><input type="text" id="stylistic_search_input" placeholder="search-term"/><span class="string-color">'</span><span class="bracket-color">) {</span>
+			</p>
+			<div id="stylistic_search_function">
+				<p>
+					<span class="keyword-color">return</span>
+					<span class="function-color">executeSearch</span><span class="bracket-color">(</span><span class="bracket-color">)</span>
+				</p>
+			</div>
+			<p class="bracket-color">}</p>
 		</div>
 		<div class="post-list" id="redvis-post-list">
 			${postInfo}
@@ -258,7 +274,7 @@ function activate(context) {
 		stylesheet = pathToDiskStyle.with({ scheme: 'vscode-resource' });
 		logo = pathToDiskLogo.with({ scheme: 'vscode-resource'});
 
-		panel.webview.html = getWebviewContent(stylesheet, logo, `<p>Search for a subreddit above</p>`);
+		panel.webview.html = getWebviewContent(stylesheet, logo, postList);
 
 		// Handle messages passed in from webview
 		panel.webview.onDidReceiveMessage(
