@@ -14,7 +14,7 @@ let panel = '';
 const responses = [];
 
 const postList = `<p><span class="keyword-color">const </span><span class="variable-color">helpText </span><span class="operator-color">= </span><span class="string-color">'Search for a subreddit above!'</span></p>`
-let currentSub = 'funny';
+let currentSub = 'all';
 // Post information detailed
 let currentPostID = '';
 let currentPostTitle = '';
@@ -68,10 +68,10 @@ const constructPostDetailView = (postInfo, postComments) => {
 	panel.webview.html = getWebviewContent(stylesheet, logo, postDetailView);
 }
 
-// Query for subreddit posts (funny by default)
+// Query for subreddit posts (all by default)
 const fetchPostsFromSub = async (subreddit, afterParam) => {
 	if (subreddit == '') {
-		subreddit = 'funny';
+		subreddit = 'all';
 	}
 
 	currentSub = subreddit;
@@ -217,12 +217,12 @@ function getWebviewContent(stylesheet, logo, postInfo) {
 				<span class="function-color">searchForSub </span>
 				<span class="bracket-color">(</span><span class="argument-color">subreddit</span>
 				<span class="operator-color">=</span>
-				<span class="string-color">'</span><input type="text" id="stylistic_search_input" placeholder="search-term"/><span class="string-color">'</span><span class="bracket-color">) {</span>
+				<span class="string-color">'</span><input type="text" id="stylistic_search_input" placeholder="${currentSub}"/><span class="string-color">'</span><span class="bracket-color">) {</span>
 			</p>
 			<div id="stylistic_search_function">
 				<p>
 					<span class="keyword-color">return</span>
-					<span class="function-color">executeSearch</span><span class="bracket-color">(</span><span class="bracket-color">)</span>
+					<a href="#" onclick="submitSearch('stylistic_search_input')" class="function-color">executeSearch</a><span class="bracket-color">(</span><span class="bracket-color">)</span>
 				</p>
 			</div>
 			<p class="bracket-color">}</p>
@@ -283,7 +283,7 @@ function activate(context) {
 					// Search subreddit for hot posts (25)
 					case 'doSearch':
 						if (message.text == '')
-							vscode.window.showInformationMessage('Performing default search of "/r/funny" ...');
+							vscode.window.showInformationMessage('Performing default search of "/r/all" ...');
 						else
 							vscode.window.showInformationMessage('Performing search of /r/' + message.text + ' ...');
 						// TODO: propery handle async function below (i.e. put in try catch)
