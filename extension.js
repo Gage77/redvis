@@ -13,7 +13,14 @@ let panel = '';
 
 const responses = [];
 
-const postList = `<p><span class="keyword-color">const </span><span class="variable-color">helpText </span><span class="operator-color">= </span><span class="string-color">'Search for a subreddit above!'</span></p>`
+const postList = `
+<p>
+<span class="keyword-color">const </span>
+<span class="variable-color">helpText </span>
+<span class="operator-color">= </span>
+<span class="string-color">'Search for a subreddit above!'</span>
+</p>
+`
 let currentSub = 'all';
 // Post information detailed
 let currentPostID = '';
@@ -49,18 +56,64 @@ const parsePostDetails = (body) => {
 // Construct html view of post details
 const constructPostDetailView = (postInfo, postComments) => {
 	// Post body
-	let postDetailView = `<span class="keyword-color">const </span><span class="variable-color">postConfig </span><span class="operator-color">= </span><span class="bracket-color">{</span>
+	let postDetailView = `
+	<span class="keyword-color">const </span>
+	<span class="variable-color">postConfig </span>
+	<span class="operator-color">= </span>
+	<span class="bracket-color">{</span>
 		<div class="post-detail-config">
-			<p><span class="string-color">'postid'</span><span class="operator-color">:</span> <span class="string-color">'${postInfo.id}'</span><span class="operator-color">,</span></p>
-			<p><span class="string-color">'author'</span><span class="operator-color">:</span> <span class="string-color">'${postInfo.author}'</span><span class="operator-color">,</span></p>
-			<p><span class="string-color">'title'</span><span class="operator-color">:</span> <span class="string-color">'${postInfo.title}'</span><span class="operator-color">,</span></p>
-			<p><span class="string-color">'selftext'</span><span class="operator-color">:</span> <span class="string-color">'${postInfo.selftext}'</span><span class="operator-color">,</span></p>
-			<p><span class="string-color">'score'</span><span class="operator-color">:</span> <span class="argument-color">${postInfo.score}</span><span class="operator-color">,</span></p>
-			<p><span class="string-color">'upvotes'</span><span class="operator-color">:</span> <span class="argument-color">${postInfo.ups}</span><span class="operator-color">,</span></p>
-			<p><span class="string-color">'downvotes'</span><span class="operator-color">:</span> <span class="argument-color">${postInfo.downs}</span><span class="operator-color">,</span></p>
-			<a class="post-url" href="https://www.reddit.com${postInfo.permalink}"><span class="string-color">'permalink'</span><span class="operator-color">:</span> <span class="string-color">'https://www.reddit.com${postInfo.permalink}'</span><span class="operator-color">,</span></a>
+			<p>
+				<span class="string-color">'postid'</span>
+				<span class="operator-color">:</span> 
+				<span class="string-color">'${postInfo.id}'</span>
+				<span class="operator-color">,</span>
+			</p>
+			<p>
+				<span class="string-color">'author'</span>
+				<span class="operator-color">:</span> 
+				<span class="string-color">'${postInfo.author}'</span>
+				<span class="operator-color">,</span>
+			</p>
+			<p>
+				<span class="string-color">'title'</span>
+				<span class="operator-color">:</span> 
+				<span class="string-color">'${postInfo.title}'</span>
+				<span class="operator-color">,</span>
+			</p>
+			<p>
+				<span class="string-color">'selftext'</span>
+				<span class="operator-color">:</span> 
+				<span class="string-color">'${postInfo.selftext}'</span>
+				<span class="operator-color">,</span>
+			</p>
+			<p>
+				<span class="string-color">'score'</span>
+				<span class="operator-color">:</span> 
+				<span class="argument-color">${postInfo.score}</span>
+				<span class="operator-color">,</span>
+			</p>
+			<p>
+				<span class="string-color">'upvotes'</span>
+				<span class="operator-color">:</span> 
+				<span class="argument-color">${postInfo.ups}</span>
+				<span class="operator-color">,</span>
+			</p>
+			<p>
+				<span class="string-color">'downvotes'</span>
+				<span class="operator-color">:</span> 
+				<span class="argument-color">${postInfo.downs}</span>
+				<span class="operator-color">,</span>
+			</p>
+			<a class="post-url" href="https://www.reddit.com${postInfo.permalink}">
+				<span class="string-color">'permalink'</span>
+				<span class="operator-color">:</span> 
+				<span class="string-color">'https://www.reddit.com${postInfo.permalink}'</span>
+				<span class="operator-color">,</span>
+			</a>
 		</div>
-	<span class="bracket-color">}</span><br/>`;
+	<span class="bracket-color">}</span>
+	<br/>
+	`;
 
 	// Post comments
 
@@ -118,7 +171,8 @@ const parseSubSearchResults = (responses) => {
 
 // Construct html for each post in list view
 const constructPostListView = (postInfo) => {
-	let postListView = `<button class="collapse-post-list" onclick=collapseDiv('post_list_container')>-</button>
+	let postListView = `
+	<button class="collapse-post-list" onclick=collapseDiv('post_list_container')>-</button>
 		<p id="sub_${currentSub}" class="current-sub-header">
 			<span class="keyword-color">const </span>
 			<span class="function-color">fetch_sub_r/${currentSub} </span>
@@ -127,20 +181,26 @@ const constructPostListView = (postInfo) => {
 			<span class="keyword-color">=> </span> 
 			<span class="bracket-color">{</span>
 		</p>
-		<div id="post_list_container" class="post-list-container">`;
+		<div id="post_list_container" class="post-list-container">
+		`;
 	for (var prop in postInfo) {
-		postListView += 
-		`<div id="${postInfo[prop].id}" class="post-list-post-container">
+		postListView += `
+		<div id="${postInfo[prop].id}" class="post-list-post-container">
 			<p>
 				<span class="keyword-color">let </span>
 				<span class="variable-color">
 					<a href="#" onclick="getPostDetails(this.innerHTML)">${postInfo[prop].id}</a>
 				</span> = 
 				<span class="string-color">
-					<span class="bracket-color">(</span>"${postInfo[prop].title}",<span class="argument-color">${postInfo[prop].author}</span><span class="bracket-color">)</span>
+					<span class="bracket-color">(
+						</span>"${postInfo[prop].title}",
+							<span class="argument-color">${postInfo[prop].author}</span>
+						<span class="bracket-color">)
+					</span>
 				</span>;
 			</p>
-		</div>`;
+		</div>
+		`;
 	}
 	postListView += `</div><span class="bracket-color">}</span>`;	// closes post_list_container
 	panel.webview.html = getWebviewContent(stylesheet, logo, postListView);
@@ -148,7 +208,8 @@ const constructPostListView = (postInfo) => {
 
 // Get Webview HTML content
 function getWebviewContent(stylesheet, logo, postInfo) {
-	return `<!DOCTYPE html>
+	return `
+	<!DOCTYPE html>
 	<html lang="en">
 	<head>
 		<meta charset="UTF-8">
@@ -203,26 +264,24 @@ function getWebviewContent(stylesheet, logo, postInfo) {
 		</script>
 
 		<!----------------HTML elements-------------------->
-		<button class="collapse-post-list move-left" onclick=collapseDiv('redditview_nav')>-</button>
-		<div class="navbar" id="redditview_nav">
-			<a onclick="submitSearch('subreddit_search_input')"><img title="Search /r/programmerhumor" alt="Search /r/programmerhumor" src="${logo}" class="logo"></a>
-			<div class="search-container">
-				<input type="text" placeholder="search" class="subreddit-search" id="subreddit_search_input">
-				<button type="submit" onclick=submitSearch('subreddit_search_input')>Search</button>
-			</div>
-		</div>
 		<div id="stylistic_search">
 			<p>
 				<span class="keyword-color">function </span>
 				<span class="function-color">searchForSub </span>
-				<span class="bracket-color">(</span><span class="argument-color">subreddit</span>
+				<span class="bracket-color">(</span>
+				<span class="argument-color">subreddit</span>
 				<span class="operator-color">=</span>
-				<span class="string-color">'</span><input type="text" id="stylistic_search_input" placeholder="${currentSub}"/><span class="string-color">'</span><span class="bracket-color">) {</span>
+				<span class="string-color">'</span>
+				<input type="text" id="stylistic_search_input" placeholder="${currentSub}"/>
+				<span class="string-color">'</span>
+				<span class="bracket-color">) {</span>
 			</p>
 			<div id="stylistic_search_function">
 				<p>
 					<span class="keyword-color">return</span>
-					<a href="#" onclick="submitSearch('stylistic_search_input')" class="function-color">executeSearch</a><span class="bracket-color">(</span><span class="bracket-color">)</span>
+					<a href="#" onclick="submitSearch('stylistic_search_input')" class="function-color">executeSearch</a>
+					<span class="bracket-color">(</span>
+					<span class="bracket-color">)</span>
 				</p>
 			</div>
 			<p class="bracket-color">}</p>
@@ -252,7 +311,7 @@ function activate(context) {
 	let disposable = vscode.commands.registerCommand('redditview.start', function () {		
 		panel = vscode.window.createWebviewPanel(
 			'redditview',	// Type of webview (internal)
-			'Reddit',	// Title of panel displayed to user
+			'r3dd1t.js',	// Title of panel displayed to user
 			vscode.ViewColumn.One,	// Column to show the new panel in
 			{
 				enableScripts: true,
