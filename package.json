@@ -18,6 +18,36 @@
 	],
 	"main": "./extension.js",
 	"contributes": {
+		"configuration": {
+			"title": "Reddit View",
+			"properties": {
+				"reddit-view.title": {
+					"type": "string",
+					"default": "Reddit",
+					"description": "Set the title of the 'Reddit View' window"
+				},
+				"reddit-view.defaultSort": {
+					"type": "array",
+					"default": ["hot", null],
+					"description": "Set the default sorting of a subreddit. Scheme: [ sorting, time ]"
+				},
+				"reddit-view.defaultSub": {
+					"type": "string",
+					"default": "all",
+					"description": "Set the default subreddit"
+				},
+				"reddit-view.help": {
+					"type": "boolean",
+					"default": true,
+					"description": "Define if the help field should be shown"
+				},
+				"reddit-view.landingPage": {
+					"type": "boolean",
+					"default": true,
+					"description": "Define if the landing page should be shown"
+				}
+			}
+		},
 		"commands": [
 			{
 				"command": "redditview.start",
