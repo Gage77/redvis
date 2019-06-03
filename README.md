@@ -3,6 +3,7 @@
 ![Reddit View](/static/RedditView.png?raw=true "Reddit View")
 
 Reddit View is a Visual Studio Code extension designed to allow users to browse top posts on specified subreddits without having to leave VS Code.
+
 Fork of [RedVis](https://github.com/Gage77/redvis).
 
 ## Features
