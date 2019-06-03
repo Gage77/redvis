@@ -14,12 +14,12 @@ let panel = '';
 const responses = [];
 
 const postList = `
-<p>
-<span class="keyword-color">const </span>
-<span class="variable-color">helpText </span>
-<span class="operator-color">= </span>
-<span class="string-color">'Search for a subreddit above!'</span>
-</p>
+	<p>
+		<span class="keyword-color">const </span>
+		<span class="variable-color">helpText </span>
+		<span class="operator-color">= </span>
+		<span class="string-color">'Search for a subreddit above!'</span>
+	</p>
 `
 let currentSub = 'all';
 // Post information detailed
@@ -31,8 +31,10 @@ let currentPostAuthor = '';
 const fetchPostDetail = async (postid) => {
 	let postBody = []
 	try {
-		const response = await fetch(`https://www.reddit.com/r/${currentSub}/comments/${postid}.json`);
-		const responseJSON = await response.json();
+		const response = await 
+			fetch(`https://www.reddit.com/r/${currentSub}/comments/${postid}.json`);
+		const responseJSON = await 
+			response.json();
 		for (var prop in responseJSON) {
 			postBody.push(responseJSON[prop]);
 		}
@@ -57,62 +59,62 @@ const parsePostDetails = (body) => {
 const constructPostDetailView = (postInfo, postComments) => {
 	// Post body
 	let postDetailView = `
-	<span class="keyword-color">const </span>
-	<span class="variable-color">postConfig </span>
-	<span class="operator-color">= </span>
-	<span class="bracket-color">{</span>
-		<div class="post-detail-config">
-			<p>
-				<span class="string-color">'postid'</span>
-				<span class="operator-color">:</span> 
-				<span class="string-color">'${postInfo.id}'</span>
-				<span class="operator-color">,</span>
-			</p>
-			<p>
-				<span class="string-color">'author'</span>
-				<span class="operator-color">:</span> 
-				<span class="string-color">'${postInfo.author}'</span>
-				<span class="operator-color">,</span>
-			</p>
-			<p>
-				<span class="string-color">'title'</span>
-				<span class="operator-color">:</span> 
-				<span class="string-color">'${postInfo.title}'</span>
-				<span class="operator-color">,</span>
-			</p>
-			<p>
-				<span class="string-color">'selftext'</span>
-				<span class="operator-color">:</span> 
-				<span class="string-color">'${postInfo.selftext}'</span>
-				<span class="operator-color">,</span>
-			</p>
-			<p>
-				<span class="string-color">'score'</span>
-				<span class="operator-color">:</span> 
-				<span class="argument-color">${postInfo.score}</span>
-				<span class="operator-color">,</span>
-			</p>
-			<p>
-				<span class="string-color">'upvotes'</span>
-				<span class="operator-color">:</span> 
-				<span class="argument-color">${postInfo.ups}</span>
-				<span class="operator-color">,</span>
-			</p>
-			<p>
-				<span class="string-color">'downvotes'</span>
-				<span class="operator-color">:</span> 
-				<span class="argument-color">${postInfo.downs}</span>
-				<span class="operator-color">,</span>
-			</p>
-			<a class="post-url" href="https://www.reddit.com${postInfo.permalink}">
-				<span class="string-color">'permalink'</span>
-				<span class="operator-color">:</span> 
-				<span class="string-color">'https://www.reddit.com${postInfo.permalink}'</span>
-				<span class="operator-color">,</span>
-			</a>
-		</div>
-	<span class="bracket-color">}</span>
-	<br/>
+		<span class="keyword-color">const </span>
+		<span class="variable-color">postConfig </span>
+		<span class="operator-color">= </span>
+		<span class="bracket-color">{</span>
+			<div class="post-detail-config">
+				<p>
+					<span class="string-color">'postid'</span>
+					<span class="operator-color">:</span> 
+					<span class="string-color">'${postInfo.id}'</span>
+					<span class="operator-color">,</span>
+				</p>
+				<p>
+					<span class="string-color">'author'</span>
+					<span class="operator-color">:</span> 
+					<span class="string-color">'${postInfo.author}'</span>
+					<span class="operator-color">,</span>
+				</p>
+				<p>
+					<span class="string-color">'title'</span>
+					<span class="operator-color">:</span> 
+					<span class="string-color">'${postInfo.title}'</span>
+					<span class="operator-color">,</span>
+				</p>
+				<p>
+					<span class="string-color">'selftext'</span>
+					<span class="operator-color">:</span> 
+					<span class="string-color">'${postInfo.selftext}'</span>
+					<span class="operator-color">,</span>
+				</p>
+				<p>
+					<span class="string-color">'score'</span>
+					<span class="operator-color">:</span> 
+					<span class="argument-color">${postInfo.score}</span>
+					<span class="operator-color">,</span>
+				</p>
+				<p>
+					<span class="string-color">'upvotes'</span>
+					<span class="operator-color">:</span> 
+					<span class="argument-color">${postInfo.ups}</span>
+					<span class="operator-color">,</span>
+				</p>
+				<p>
+					<span class="string-color">'downvotes'</span>
+					<span class="operator-color">:</span> 
+					<span class="argument-color">${postInfo.downs}</span>
+					<span class="operator-color">,</span>
+				</p>
+				<a class="post-url" href="https://www.reddit.com${postInfo.permalink}">
+					<span class="string-color">'permalink'</span>
+					<span class="operator-color">:</span> 
+					<span class="string-color">'https://www.reddit.com${postInfo.permalink}'</span>
+					<span class="operator-color">,</span>
+				</a>
+			</div>
+		<span class="bracket-color">}</span>
+		<br/>
 	`;
 
 	// Post comments
@@ -130,8 +132,10 @@ const fetchPostsFromSub = async (subreddit, afterParam) => {
 	currentSub = subreddit;
 
 	try {
-		const response = await fetch(`https://www.reddit.com/r/${subreddit}.json?limit=${postsPerRequest}${afterParam ? '&afterParam=' + afterParam : ''}`);
-		const responseJSON = await response.json();
+		const response = await 
+			fetch(`https://www.reddit.com/r/${subreddit}.json?limit=${postsPerRequest}${afterParam ? '&afterParam=' + afterParam : ''}`);
+		const responseJSON = await 
+			response.json();
 		responses.push(responseJSON);
 		// Recursively fetch until we get maxRequests posts
 		if(responseJSON.data.after && responses.length < maxRequests) {
@@ -153,7 +157,7 @@ const parseSubSearchResults = (responses) => {
 
 	let postInfo = {};
 
-	allPosts.forEach(({ data: { title, id, author, score, selftext, ups, downs, url } }) => {
+	allPosts.forEach(({ data: { title, id, author, score, selftext, ups, downs, url, subreddit } }) => {
 		postInfo[id] = { 
 			title,
 			id,
@@ -162,7 +166,8 @@ const parseSubSearchResults = (responses) => {
 			selftext,
 			ups,
 			downs,
-			url
+			url,
+			subreddit
 		}
 	});
 
@@ -172,7 +177,7 @@ const parseSubSearchResults = (responses) => {
 // Construct html for each post in list view
 const constructPostListView = (postInfo) => {
 	let postListView = `
-	<button class="collapse-post-list" onclick=collapseDiv('post_list_container')>-</button>
+		<button class="collapse-post-list" onclick=collapseDiv('post_list_container')>-</button>
 		<p id="sub_${currentSub}" class="current-sub-header">
 			<span class="keyword-color">const </span>
 			<span class="function-color">fetch_sub_r/${currentSub} </span>
@@ -182,115 +187,122 @@ const constructPostListView = (postInfo) => {
 			<span class="bracket-color">{</span>
 		</p>
 		<div id="post_list_container" class="post-list-container">
-		`;
+	`;
 	for (var prop in postInfo) {
 		postListView += `
-		<div id="${postInfo[prop].id}" class="post-list-post-container">
-			<p>
-				<span class="keyword-color">let </span>
-				<span class="variable-color">
-					<a href="#" onclick="getPostDetails(this.innerHTML)">${postInfo[prop].id}</a>
-				</span> = 
-				<span class="string-color">
-					<span class="bracket-color">(
-						</span>"${postInfo[prop].title}",
-							<span class="argument-color">${postInfo[prop].author}</span>
-						<span class="bracket-color">)
+			<div id="${postInfo[prop].id}" class="post-list-post-container">
+				<p>
+					<span class="keyword-color">let </span>
+					<span class="variable-color">
+						<a href="#" onclick="getPostDetails(this.innerHTML)">${postInfo[prop].id}</a>
 					</span>
-				</span>;
-			</p>
-		</div>
+					 = 
+					<span class="string-color">
+						<span class="bracket-color">(</span>
+						"${postInfo[prop].title}",
+						<span class="argument-color">${postInfo[prop].author}</span>
+						,
+						<span class="bracket-color"> { </span>
+						<span class="variable-color"> ${postInfo[prop].subreddit}</span>
+						<span class="bracket-color"> } </span>
+						<span class="bracket-color">)</span>
+					</span>;
+				</p>
+			</div>
 		`;
 	}
-	postListView += `</div><span class="bracket-color">}</span>`;	// closes post_list_container
+	postListView += `
+		</div><span class="bracket-color">}</span>
+	`;	// closes post_list_container
 	panel.webview.html = getWebviewContent(stylesheet, logo, postListView);
 }
 
 // Get Webview HTML content
 function getWebviewContent(stylesheet, logo, postInfo) {
 	return `
-	<!DOCTYPE html>
-	<html lang="en">
-	<head>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<link rel="stylesheet" href="${stylesheet}">
-		<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
-	</head>
-	<body>
-	<!----------------SCRIPTS-------------------->
-	<script>
-			const vscode = acquireVsCodeApi();
+		<!DOCTYPE html>
+		<html lang="en">
+		<head>
+			<meta charset="UTF-8">
+			<meta name="viewport" content="width=device-width, initial-scale=1.0">
+			<link rel="stylesheet" href="${stylesheet}">
+			<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
+		</head>
+		<body>
+		<!----------------SCRIPTS-------------------->
+		<script>
+				const vscode = acquireVsCodeApi();
 
-			// Handle vs extension message passing (from extension to webpage)
-			window.addEventListener('message', event => {
-				const message = event.data;
-				switch(message.command) {
-					case 'updateView':
-						console.log('updating view');
-						break;
-				}
-			});
-
-			// Handle vs extension message passing (from webpage to extension)
-			function handleMessageSending(messageText, messageCommand) {
-				vscode.postMessage({
-					command: messageCommand,
-					text: messageText
+				// Handle vs extension message passing (from extension to webpage)
+				window.addEventListener('message', event => {
+					const message = event.data;
+					switch(message.command) {
+						case 'updateView':
+							console.log('updating view');
+							break;
+					}
 				});
-			}
 
-			// Search 
-			function submitSearch(subreddit_search_input) {
-				const searchFieldText = document.getElementById(subreddit_search_input).value;
-				handleMessageSending(searchFieldText, 'doSearch');
-			}
+				// Handle vs extension message passing (from webpage to extension)
+				function handleMessageSending(messageText, messageCommand) {
+					vscode.postMessage({
+						command: messageCommand,
+						text: messageText
+					});
+				}
+
+				// Search 
+				function submitSearch(subreddit_search_input) {
+					const searchFieldText = document.getElementById(subreddit_search_input).value;
+					handleMessageSending(searchFieldText, 'doSearch');
+				}
 			
-			// Get details on specified post
-			function getPostDetails(postid) {
-				handleMessageSending(postid, 'doGetPostDetails');
-			}
-
-			// Collapse the post-list view 
-			function collapseDiv(divid) {
-				selectedDiv = document.getElementById(divid);
-				if (selectedDiv.style.display === "none") {
-					selectedDiv.style.display = "block";
+				// Get details on specified post
+				function getPostDetails(postid) {
+					handleMessageSending(postid, 'doGetPostDetails');
 				}
-				else {
-					selectedDiv.style.display = "none";
-				}
-			}
-		</script>
 
-		<!----------------HTML elements-------------------->
-		<div id="stylistic_search">
-			<p>
-				<span class="keyword-color">function </span>
-				<span class="function-color">searchForSub </span>
-				<span class="bracket-color">(</span>
-				<span class="argument-color">subreddit</span>
-				<span class="operator-color">=</span>
-				<span class="string-color">'</span>
-				<input type="text" id="stylistic_search_input" placeholder="${currentSub}"/>
-				<span class="string-color">'</span>
-				<span class="bracket-color">) {</span>
-			</p>
-			<div id="stylistic_search_function">
+				// Collapse the post-list view 
+				function collapseDiv(divid) {
+					selectedDiv = document.getElementById(divid);
+					if (selectedDiv.style.display === "none") {
+						selectedDiv.style.display = "block";
+					}
+					else {
+						selectedDiv.style.display = "none";
+					}
+				}
+			</script>
+
+			<!----------------HTML elements-------------------->
+			<div id="stylistic_search">
 				<p>
-					<span class="keyword-color">return</span>
-					<a href="#" onclick="submitSearch('stylistic_search_input')" class="function-color">executeSearch</a>
+					<span class="keyword-color">function </span>
+					<span class="function-color">searchForSub </span>
 					<span class="bracket-color">(</span>
-					<span class="bracket-color">)</span>
+					<span class="argument-color">subreddit</span>
+					<span class="operator-color">=</span>
+					<span class="string-color">'</span>
+					<input type="text" id="stylistic_search_input" placeholder="${currentSub}"/>
+					<span class="string-color">'</span>
+					<span class="bracket-color">) {</span>
 				</p>
+				<div id="stylistic_search_function">
+					<p>
+						<span class="keyword-color">return</span>
+						<a href="#" onclick="submitSearch('stylistic_search_input')" class="function-color">executeSearch</a>
+					<span class="bracket-color">(</span>
+						<span class="bracket-color">)</span>
+					</p>
+				</div>
+				<p class="bracket-color">}</p>
 			</div>
-			<p class="bracket-color">}</p>
-		</div>
-		<div class="post-list" id="redditview-post-list">
-			${postInfo}
-		</div>
-	</body>
-	</html>`;
+			<div class="post-list" id="redditview-post-list">
+				${postInfo}
+			</div>
+		</body>
+		</html>
+	`;
 }
 
 /**
