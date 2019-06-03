@@ -203,8 +203,8 @@ function getWebviewContent(stylesheet, logo, postInfo) {
 		</script>
 
 		<!----------------HTML elements-------------------->
-		<button class="collapse-post-list move-left" onclick=collapseDiv('redvis_nav')>-</button>
-		<div class="navbar" id="redvis_nav">
+		<button class="collapse-post-list move-left" onclick=collapseDiv('redditview_nav')>-</button>
+		<div class="navbar" id="redditview_nav">
 			<a onclick="submitSearch('subreddit_search_input')"><img title="Search /r/programmerhumor" alt="Search /r/programmerhumor" src="${logo}" class="logo"></a>
 			<div class="search-container">
 				<input type="text" placeholder="search" class="subreddit-search" id="subreddit_search_input">
@@ -227,7 +227,7 @@ function getWebviewContent(stylesheet, logo, postInfo) {
 			</div>
 			<p class="bracket-color">}</p>
 		</div>
-		<div class="post-list" id="redvis-post-list">
+		<div class="post-list" id="redditview-post-list">
 			${postInfo}
 		</div>
 	</body>
@@ -242,17 +242,17 @@ function activate(context) {
 	let currentPanel = undefined;
 
 	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	console.log('"RedVis" is now active!');
+	console.log('"Reddit View" is now active!');
 
 	// The command has been defined in the package.json file
 	// Now provide the implementation of the command with  registerCommand
 	// The commandId parameter must match the command field in package.json
 
 	//----------COMMANDS----------//
-	let disposable = vscode.commands.registerCommand('redvis.start', function () {		
+	let disposable = vscode.commands.registerCommand('redditview.start', function () {		
 		panel = vscode.window.createWebviewPanel(
-			'redvis',	// Type of webview (internal)
-			'RedVis',	// Title of panel displayed to user
+			'redditview',	// Type of webview (internal)
+			'Reddit',	// Title of panel displayed to user
 			vscode.ViewColumn.One,	// Column to show the new panel in
 			{
 				enableScripts: true,
@@ -268,7 +268,7 @@ function activate(context) {
 		);
 
 		const pathToDiskLogo = vscode.Uri.file(
-			path.join(context.extensionPath, 'static', 'RedVis.png')
+			path.join(context.extensionPath, 'static', 'RedditView.png')
 		);
 
 		stylesheet = pathToDiskStyle.with({ scheme: 'vscode-resource' });
@@ -302,7 +302,7 @@ function activate(context) {
 	});
 
 	context.subscriptions.push(
-		vscode.commands.registerCommand('redvis.updateView', () => {
+		vscode.commands.registerCommand('redditview.updateView', () => {
 			if (!currentPanel) {
 				return;
 			}

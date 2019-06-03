@@ -1,11 +1,11 @@
 {
-	"name": "redvis",
-	"displayName": "RedVis",
+	"name": "reddit-view",
+	"displayName": "Reddit View",
 	"description": "Browse Reddit in VS Code",
-	"publisher": "gage77",
-	"version": "2.0.0",
-	"icon": "static/RedVis_icon.png",
-	"repository": "https://github.com/Gage77/redvis",
+	"publisher": "ekarbe",
+	"version": "2.0.1",
+	"icon": "static/RedditView_icon.png",
+	"repository": "https://github.com/ekarbe/reddit-view",
 	"galleryBanner.color": "#EE4848",
 	"engines": {
 		"vscode": "^1.31.0"
@@ -14,14 +14,14 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:redvis.start"
+		"onCommand:redditview.start"
 	],
 	"main": "./extension.js",
 	"contributes": {
 		"commands": [
 			{
-				"command": "redvis.start",
-				"title": "Start RedVis"
+				"command": "redditview.start",
+				"title": "Reddit"
 			}
 		]
 	},
