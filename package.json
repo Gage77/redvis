@@ -21,12 +21,12 @@
 		"configuration": {
 			"title": "Reddit View",
 			"properties": {
-				"reddit-view.title": {
+				"redditview.title": {
 					"type": "string",
 					"default": "Reddit",
 					"description": "Set the title of the 'Reddit View' window"
 				},
-				"reddit-view.defaultSort": {
+				"redditview.defaultSort": {
 					"type": "array",
 					"default": [
 						"hot",
@@ -34,17 +34,17 @@
 					],
 					"description": "Set the default sorting of a subreddit. Scheme: [ sorting, time ]"
 				},
-				"reddit-view.defaultSub": {
+				"redditview.defaultSubreddit": {
 					"type": "string",
 					"default": "all",
 					"description": "Set the default subreddit"
 				},
-				"reddit-view.help": {
+				"redditview.help": {
 					"type": "boolean",
 					"default": true,
 					"description": "Define if the help field should be shown"
 				},
-				"reddit-view.landingPage": {
+				"redditview.landingPage": {
 					"type": "boolean",
 					"default": true,
 					"description": "Define if the landing page should be shown"

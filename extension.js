@@ -1,164 +1,138 @@
-//-------------- includes -----------------//
-const vscode = require('vscode');
-const fetch = require('node-fetch');
-const path = require('path');
+// modules
+const fetch = require( 'node-fetch' );
+const path = require( 'path' );
+const vscode = require( 'vscode' );
 
-//---------- constants / globals ----------//
-const postsPerRequest = 50;
-const maxPostsToFetch =  250;
-const maxRequests = maxPostsToFetch / postsPerRequest;
-let stylesheet = '';
-let logo = '';
-let panel = '';
+// global variables
 
-const responses = [];
+// extension config from workspace
+let config = vscode.workspace.getConfiguration('redditview');
+// the current selected subreddit
+let currentSubreddit = config.defaultSubreddit;
 
-const postList = `
+let panel;
+let currentPanel;
+let stylesheet;
+let posts = [];
+
+// return home panel html
+const homePanel = `
+	<p>
+		<span class="keyword-color">const </span>
+		<span class="variable-color">home </span>
+		<span class="operator-color">= </span>
+		<span class="function-color">require</span><span class="bracket-color">(</span>
+		<span class="string-color">'home-env'</span>
+		<span class="bracket-color">)</span><span class="variable-color">;</span>
+	</p>
+`;
+
+// help panel html
+const helpPanel = `
 	<p>
 		<span class="keyword-color">const </span>
 		<span class="variable-color">helpText </span>
 		<span class="operator-color">= </span>
-		<span class="string-color">'Search for a subreddit above!'</span>
+		<span class="bracket-color">{</span>
+		</br>
+		<span class="string-color">&nbsp; &nbsp; "search"</span>
+		<span class="operator-color">: </span>
+		<span class="string-color">"insert a subreddit name into the input at the top and click 'executeSearch' to start searching for it"</span>
+		<span class="operator-color">,</span>
+		</br>
+		<span class="string-color">&nbsp; &nbsp; "home"</span>
+		<span class="operator-color">: </span>
+		<span class="string-color">"you can navigate back to this landing page by clicking on the home-env"</span>
+		<span class="operator-color">,</span>
+		</br>
+		<span class="string-color">&nbsp; &nbsp; "sort"</span>
+		<span class="operator-color">: </span>
+		<span class="string-color">"to sort the subreddit you can click on the sortingn navigation and choose a time interval"</span>
+		<span class="operator-color">,</span>
+		</br>
+		<span class="string-color">&nbsp; &nbsp; "back"</span>
+		<span class="operator-color">: </span>
+		<span class="string-color">"to go back to the overview of a subreddit you have to click on the subreddit-env"</span>
+		<span class="operator-color">,</span>
+		</br>
+		<span class="string-color">&nbsp; &nbsp; "post"</span>
+		<span class="operator-color">: </span>
+		<span class="string-color">"to open a post you can click on its ID"</span>
+		<span class="operator-color">,</span>
+		</br>
+		<span class="string-color">&nbsp; &nbsp; "comment"</span>
+		<span class="operator-color">: </span>
+		<span class="string-color">"to open comments you have to click on the 'for' and to close comments you have to click on the let"</span>
+		<span class="operator-color">,</span>
+		</br>
+		<span class="bracket-color">}</span><span class="variable-color">;</span>
+	</p>
+`;
+
+// project panel html
+const projectPanel = `
+	<p>
+			<span class="operator-color">module</span><span class="variable-color">.</span><span class="function-color">exports</span>
+			<span class="operator-color">=</span>
+			<span class="bracket-color">{</span>
+			</br>
+			<span class="variable-color">&nbsp; &nbsp; help,</span>
+			</br>
+			<span class="variable-color">&nbsp; &nbsp; issues,</span>
+			</br>
+			<span class="variable-color">&nbsp; &nbsp; project</span>
+			</br>
+			<span class="bracket-color">}</span>
 	</p>
 `
-let currentSub = 'all';
-// Post information detailed
-let currentPostID = '';
-let currentPostTitle = '';
-let currentPostAuthor = '';
 
-// Query for individual post details
-const fetchPostDetail = async (postid) => {
-	let postBody = []
-	try {
-		const response = await 
-			fetch(`https://www.reddit.com/r/${currentSub}/comments/${postid}.json`);
-		const responseJSON = await 
-			response.json();
-		for (var prop in responseJSON) {
-			postBody.push(responseJSON[prop]);
-		}
-		parsePostDetails(postBody);
-	} catch (error) {
-		console.log(error);
-	}
-}
+// empty or wrong subreddit panel html
+const emptyPanel = `
+	<p>
+			<span class="comment-color">// the subreddit "${currentSubreddit}" seems to be empty or wrong</span>
+			</br>
+			<span class="keyword-color">function</span>
+			<span class="function-color">isEmpty</span><span class="bracket-color">() {</span>
+			</br>
+			<span class="keyword-color">&nbsp; &nbsp; return</span>
+			<span class="argument-color">true</span><span class="variable-color">;</span>
+			</br>
+			<span class="bracket-color">}</span>
+	</p>
+`;
 
-// Parse json response of post details
-const parsePostDetails = (body) => {
-	let postBodyChildren = body[0].data.children[0];
-	let postInfo = body[0].data.children[0].data;
-
-	let postComments = {}
-	let postCommentList = body[1].data.children
-
-	constructPostDetailView(postInfo, postComments);
-}
-
-// Construct html view of post details
-const constructPostDetailView = (postInfo, postComments) => {
-	// Post body
-	let postDetailView = `
-		<span class="keyword-color">const </span>
-		<span class="variable-color">postConfig </span>
-		<span class="operator-color">= </span>
-		<span class="bracket-color">{</span>
-			<div class="post-detail-config">
-				<p>
-					<span class="string-color">'postid'</span>
-					<span class="operator-color">:</span> 
-					<span class="string-color">'${postInfo.id}'</span>
-					<span class="operator-color">,</span>
-				</p>
-				<p>
-					<span class="string-color">'author'</span>
-					<span class="operator-color">:</span> 
-					<span class="string-color">'${postInfo.author}'</span>
-					<span class="operator-color">,</span>
-				</p>
-				<p>
-					<span class="string-color">'title'</span>
-					<span class="operator-color">:</span> 
-					<span class="string-color">'${postInfo.title}'</span>
-					<span class="operator-color">,</span>
-				</p>
-				<p>
-					<span class="string-color">'selftext'</span>
-					<span class="operator-color">:</span> 
-					<span class="string-color">'${postInfo.selftext}'</span>
-					<span class="operator-color">,</span>
-				</p>
-				<p>
-					<span class="string-color">'score'</span>
-					<span class="operator-color">:</span> 
-					<span class="argument-color">${postInfo.score}</span>
-					<span class="operator-color">,</span>
-				</p>
-				<p>
-					<span class="string-color">'upvotes'</span>
-					<span class="operator-color">:</span> 
-					<span class="argument-color">${postInfo.ups}</span>
-					<span class="operator-color">,</span>
-				</p>
-				<p>
-					<span class="string-color">'downvotes'</span>
-					<span class="operator-color">:</span> 
-					<span class="argument-color">${postInfo.downs}</span>
-					<span class="operator-color">,</span>
-				</p>
-				<a class="post-url" href="https://www.reddit.com${postInfo.permalink}">
-					<span class="string-color">'permalink'</span>
-					<span class="operator-color">:</span> 
-					<span class="string-color">'https://www.reddit.com${postInfo.permalink}'</span>
-					<span class="operator-color">,</span>
-				</a>
-			</div>
-		<span class="bracket-color">}</span>
-		<br/>
-	`;
-
-	// Post comments
-
-
-	panel.webview.html = getWebviewContent(stylesheet, logo, postDetailView);
-}
-
-// Query for subreddit posts (all by default)
-const fetchPostsFromSub = async (subreddit, afterParam) => {
+// get posts of subreddit
+const getSubredditPosts = async (subreddit, afterParam) => {
 	if (subreddit == '') {
-		subreddit = 'all';
+		subreddit = config.defaultSubreddit;
 	}
-
-	currentSub = subreddit;
+	currentSubreddit = subreddit;
 
 	try {
-		const response = await 
-			fetch(`https://www.reddit.com/r/${subreddit}.json?limit=${postsPerRequest}${afterParam ? '&afterParam=' + afterParam : ''}`);
-		const responseJSON = await 
+		const response = await
+			fetch(`https://www.reddit.com/r/${subreddit}.json`);
+		const responseJSON = await
 			response.json();
-		responses.push(responseJSON);
-		// Recursively fetch until we get maxRequests posts
-		if(responseJSON.data.after && responses.length < maxRequests) {
-			fetchPostsFromSub(subreddit, responseJSON.data.after);
-			return;
-		}
-		parseSubSearchResults(responses);
+		posts.push(responseJSON);
+
+		parseSubredditPosts(posts);
 	} catch (error) {
-		console.log(error);
+		vscode.window.showErrorMessage(error);
 	}
 }
 
-// Parse json response from subreddit search
-const parseSubSearchResults = (responses) => {
+// parse subreddit posts
+const parseSubredditPosts = (posts) => {
+	console.log("Parse posts");
 	const allPosts = [];
-	responses.forEach(response => {
-		allPosts.push(...response.data.children);
+	posts.forEach(post => {
+		allPosts.push(...post.data.children);
 	});
 
 	let postInfo = {};
 
-	allPosts.forEach(({ data: { title, id, author, score, selftext, ups, downs, url, subreddit } }) => {
-		postInfo[id] = { 
+	allPosts.forEach(({ data: { title, id, author, score, selftext, ups, downs, url, subreddit }}) => {
+		postInfo[id] = {
 			title,
 			id,
 			author,
@@ -171,26 +145,106 @@ const parseSubSearchResults = (responses) => {
 		}
 	});
 
-	return constructPostListView(postInfo);
+	return constructPostListPanel(postInfo);
 }
 
-// Construct html for each post in list view
-const constructPostListView = (postInfo) => {
-	let postListView = `
-		<button class="collapse-post-list" onclick=collapseDiv('post_list_container')>-</button>
-		<p id="sub_${currentSub}" class="current-sub-header">
-			<span class="keyword-color">const </span>
-			<span class="function-color">fetch_sub_r/${currentSub} </span>
-			<span class="operator-color">= </span>
-			<span class="bracket-color">() </span>
-			<span class="keyword-color">=> </span> 
-			<span class="bracket-color">{</span>
-		</p>
-		<div id="post_list_container" class="post-list-container">
+// get details of a post
+const getPostDetail = async (postID) => {
+	let body = [];
+	try {
+		const response = await
+			fetch(`https://www.reddit.com/r/${currentSubreddit}/comments/${postID}.json`);
+		const responseJSON = await
+			response.json();
+		for (var prop in responseJSON) {
+			body.push(responseJSON[prop]);
+		}
+		constructPostDetailPanel(body[0].data.children[0].data);
+	} catch (error) {
+		vscode.window.showErrorMessage(error);
+	}
+}
+
+// constructs html panel of post details
+const constructPostDetailPanel = (postInfo) => {
+	let postDetailPanel = `
+	<span class="keyword-color">const </span>
+	<span class="variable-color">postConfig </span>
+	<span class="operator-color">= </span>
+	<span class="bracket-color">{</span>
+		<div class="post-detail-config">
+			<p>
+				<span class="string-color">'postid'</span>
+				<span class="operator-color">:</span> 
+				<span class="string-color">'${postInfo.id}'</span>
+				<span class="operator-color">,</span>
+			</p>
+			<p>
+				<span class="string-color">'author'</span>
+				<span class="operator-color">:</span> 
+				<span class="string-color">'${postInfo.author}'</span>
+				<span class="operator-color">,</span>
+			</p>
+			<p>
+				<span class="string-color">'title'</span>
+				<span class="operator-color">:</span> 
+				<span class="string-color">'${postInfo.title}'</span>
+				<span class="operator-color">,</span>
+			</p>
+			<p>
+				<span class="string-color">'selftext'</span>
+				<span class="operator-color">:</span> 
+				<span class="string-color">'${postInfo.selftext}'</span>
+				<span class="operator-color">,</span>
+			</p>
+			<p>
+				<span class="string-color">'score'</span>
+				<span class="operator-color">:</span> 
+				<span class="argument-color">${postInfo.score}</span>
+				<span class="operator-color">,</span>
+			</p>
+			<p>
+				<span class="string-color">'upvotes'</span>
+				<span class="operator-color">:</span> 
+				<span class="argument-color">${postInfo.ups}</span>
+				<span class="operator-color">,</span>
+			</p>
+			<p>
+				<span class="string-color">'downvotes'</span>
+				<span class="operator-color">:</span> 
+				<span class="argument-color">${postInfo.downs}</span>
+				<span class="operator-color">,</span>
+			</p>
+			<a class="post-url" href="https://www.reddit.com${postInfo.permalink}">
+				<span class="string-color">'permalink'</span>
+				<span class="operator-color">:</span> 
+				<span class="string-color">'https://www.reddit.com${postInfo.permalink}'</span>
+				<span class="operator-color">,</span>
+			</a>
+		</div>
+	<span class="bracket-color">}</span>
+	<br/>
+	`;
+
+	panel.webview.html = getWebviewContent(stylesheet, postDetailPanel);
+}
+
+const constructPostListPanel = (postInfo) => {
+	let postListPanel = `
+	<button class="collapse-post-list" onclick=collapseDiv('post_list_container')>-</button>
+	<p id="sub_${currentSubreddit}" class="current-sub-header">
+		<span class="keyword-color">const </span>
+		<span class="function-color">fetch_sub_r/${currentSubreddit} </span>
+		<span class="operator-color">= </span>
+		<span class="bracket-color">() </span>
+		<span class="keyword-color">=> </span> 
+		<span class="bracket-color">{</span>
+	</p>
+	<div id="post_list_container" class="post-list-container">
 	`;
 	for (var prop in postInfo) {
-		postListView += `
-			<div id="${postInfo[prop].id}" class="post-list-post-container">
+		postListPanel += `
+		<div id="${postInfo[prop].id}" class="post-list-post-container">
 				<p>
 					<span class="keyword-color">let </span>
 					<span class="variable-color">
@@ -211,97 +265,92 @@ const constructPostListView = (postInfo) => {
 			</div>
 		`;
 	}
-	postListView += `
+	postListPanel += `
 		</div><span class="bracket-color">}</span>
-	`;	// closes post_list_container
-	panel.webview.html = getWebviewContent(stylesheet, logo, postListView);
+	`;
+	panel.webview.html = getWebviewContent(stylesheet, postListPanel);
 }
 
-// Get Webview HTML content
-function getWebviewContent(stylesheet, logo, postInfo) {
+// gets webview html content
+function getWebviewContent(stylesheet, postInfo) {
 	return `
-		<!DOCTYPE html>
-		<html lang="en">
-		<head>
-			<meta charset="UTF-8">
-			<meta name="viewport" content="width=device-width, initial-scale=1.0">
-			<link rel="stylesheet" href="${stylesheet}">
-			<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
-		</head>
-		<body>
-		<!----------------SCRIPTS-------------------->
-		<script>
-				const vscode = acquireVsCodeApi();
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" href="${stylesheet}">
+		<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
+	</head>
+	<body>
+	<!----------------SCRIPTS-------------------->
+	<script>
+			const vscode = acquireVsCodeApi();
 
-				// Handle vs extension message passing (from extension to webpage)
-				window.addEventListener('message', event => {
-					const message = event.data;
-					switch(message.command) {
-						case 'updateView':
-							console.log('updating view');
-							break;
-					}
+			// Handle vs extension message passing (from extension to webpage)
+			window.addEventListener('message', event => {
+				const message = event.data;
+				switch(message.command) {
+					case 'updateView':
+						console.log('updating view');
+						break;
+				}
+			});
+
+			// Handle vs extension message passing (from webpage to extension)
+			function handleMessageSending(messageText, messageCommand) {
+				vscode.postMessage({
+					command: messageCommand,
+					text: messageText
 				});
+			}
 
-				// Handle vs extension message passing (from webpage to extension)
-				function handleMessageSending(messageText, messageCommand) {
-					vscode.postMessage({
-						command: messageCommand,
-						text: messageText
-					});
-				}
+			// Search 
+			function submitSearch(subreddit_search_input) {
+				const searchFieldText = document.getElementById(subreddit_search_input).value;
+				handleMessageSending(searchFieldText, 'doSearch');
+			}
+		
+			// Get details on specified post
+			function getPostDetails(postid) {
+				handleMessageSending(postid, 'doGetPostDetails');
+			}
 
-				// Search 
-				function submitSearch(subreddit_search_input) {
-					const searchFieldText = document.getElementById(subreddit_search_input).value;
-					handleMessageSending(searchFieldText, 'doSearch');
+			// Collapse the post-list view 
+			function collapseDiv(divid) {
+				selectedDiv = document.getElementById(divid);
+				if (selectedDiv.style.display === "none") {
+					selectedDiv.style.display = "block";
 				}
-			
-				// Get details on specified post
-				function getPostDetails(postid) {
-					handleMessageSending(postid, 'doGetPostDetails');
+				else {
+					selectedDiv.style.display = "none";
 				}
+			}
+		</script>
 
-				// Collapse the post-list view 
-				function collapseDiv(divid) {
-					selectedDiv = document.getElementById(divid);
-					if (selectedDiv.style.display === "none") {
-						selectedDiv.style.display = "block";
-					}
-					else {
-						selectedDiv.style.display = "none";
-					}
-				}
-			</script>
-
-			<!----------------HTML elements-------------------->
-			<div id="stylistic_search">
-				<p>
-					<span class="keyword-color">function </span>
-					<span class="function-color">searchForSub </span>
-					<span class="bracket-color">(</span>
-					<span class="argument-color">subreddit</span>
-					<span class="operator-color">=</span>
-					<span class="string-color">'</span>
-					<input type="text" id="stylistic_search_input" placeholder="${currentSub}"/>
-					<span class="string-color">'</span>
-					<span class="bracket-color">) {</span>
-				</p>
-				<div id="stylistic_search_function">
-					<p>
-						<span class="keyword-color">return</span>
-						<a href="#" onclick="submitSearch('stylistic_search_input')" class="function-color">executeSearch</a>
-					<span class="bracket-color">(</span>
-						<span class="bracket-color">)</span>
-					</p>
-				</div>
-				<p class="bracket-color">}</p>
-			</div>
-			<div class="post-list" id="redditview-post-list">
-				${postInfo}
-			</div>
-		</body>
-		</html>
+		<!----------------HTML elements-------------------->
+		<div id="stylistic_search">
+			<p>
+				<span class="keyword-color">function </span>
+				<span class="function-color">search</span><span class="bracket-color">(</span>
+				<span class="argument-color">subreddit</span>
+				<span class="operator-color">=</span>
+				<span class="string-color">'</span>
+				<input type="text" id="stylistic_search_input" placeholder="${currentSubreddit}"/>
+				<span class="string-color">'</span>
+				<span class="bracket-color">) {</span>
+				</br>
+				<span class="keyword-color">&nbsp; &nbsp; return</span>
+				<a href="#" onclick="submitSearch('stylistic_search_input')" class="function-color">executeSearch</a><span class="bracket-color">(</span><span class="bracket-color">)</span>
+				</br>
+				<span class="bracket-color">}</span>
+			</p>
+		</div>
+		<div class="post-list" id="redditview-post-list">
+			${postInfo}
+		</div>
+	</body>
+	</html>
 	`;
 }
 
@@ -309,61 +358,37 @@ function getWebviewContent(stylesheet, logo, postInfo) {
  * @param {vscode.ExtensionContext} context
  */
 function activate(context) {
-
-	let currentPanel = undefined;
-
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	console.log('"Reddit View" is now active!');
-
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with  registerCommand
-	// The commandId parameter must match the command field in package.json
-
-	//----------COMMANDS----------//
-	let disposable = vscode.commands.registerCommand('redditview.start', function () {		
+	// commands
+	let disposable = vscode.commands.registerCommand('redditview.start', function () {
 		panel = vscode.window.createWebviewPanel(
-			'redditview',	// Type of webview (internal)
-			'r3dd1t.js',	// Title of panel displayed to user
-			vscode.ViewColumn.One,	// Column to show the new panel in
+			'redditview',
+			config.title,
+			vscode.ViewColumn.One,
 			{
 				enableScripts: true,
 				localResourceRoots: [vscode.Uri.file(path.join(context.extensionPath, 'static'))],
 			}
 		);
 
-		// set current panel to the newly created panel
 		currentPanel = panel;
 
-		const pathToDiskStyle = vscode.Uri.file(
-			path.join(context.extensionPath, 'static', 'styles.css')
-		);
+		stylesheet = vscode.Uri.file(path.join(context.extensionPath, 'static', 'styles.css'))
+			.with({ scheme: 'vscode-resource'});
 
-		const pathToDiskLogo = vscode.Uri.file(
-			path.join(context.extensionPath, 'static', 'RedditView.png')
-		);
+		panel.webview.html = getWebviewContent(stylesheet, helpPanel);
 
-		stylesheet = pathToDiskStyle.with({ scheme: 'vscode-resource' });
-		logo = pathToDiskLogo.with({ scheme: 'vscode-resource'});
-
-		panel.webview.html = getWebviewContent(stylesheet, logo, postList);
-
-		// Handle messages passed in from webview
 		panel.webview.onDidReceiveMessage(
 			message => {
 				switch (message.command) {
-					// Search subreddit for hot posts (25)
 					case 'doSearch':
 						if (message.text == '')
 							vscode.window.showInformationMessage('Performing default search of "/r/all" ...');
 						else
 							vscode.window.showInformationMessage('Performing search of /r/' + message.text + ' ...');
-						// TODO: propery handle async function below (i.e. put in try catch)
-						fetchPostsFromSub(message.text, null);
+						getSubredditPosts(message.text);
 						return;
-					// Get the details of specified post
 					case 'doGetPostDetails':
-						vscode.window.showInformationMessage('Getting post details for id: "' + message.text + '" ...');
-						fetchPostDetail(message.text);
+						vscode.window.showInformationMessage('Getting post details for ' + message.text + ' ...');
 						return;
 				}
 			},
@@ -377,7 +402,6 @@ function activate(context) {
 			if (!currentPanel) {
 				return;
 			}
-
 			currentPanel.webview.postMessage({ command: 'updateView' });
 		})
 	);
